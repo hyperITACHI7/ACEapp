@@ -1,0 +1,73 @@
+/* Skills (Motion Marquee) — full-bleed, edge to edge, no heading */
+
+.widget-skills-marquee-fullbleed {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  padding: 4rem 0;
+  overflow: hidden;
+}
+
+.widget-skills-marquee-row {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.widget-skills-marquee-row + .widget-skills-marquee-row {
+  margin-top: 1rem;
+}
+
+.widget-skills-marquee-track {
+  display: inline-flex;
+  gap: 1rem;
+  animation: widget-skills-marquee-a 28s linear infinite;
+}
+
+.widget-skills-marquee-row--b .widget-skills-marquee-track {
+  animation-name: widget-skills-marquee-b;
+  animation-duration: 24s;
+}
+
+@keyframes widget-skills-marquee-a {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes widget-skills-marquee-b {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+.widget-skills-marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.widget-skills-marquee-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: var(--accent-2, var(--accent));
+}
+
+.widget-skills-marquee-row--b .widget-skills-marquee-dot {
+  background: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .widget-skills-marquee-track {
+    animation: none;
+  }
+}

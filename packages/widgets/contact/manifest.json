@@ -1,0 +1,8 @@
+{
+  "key": "contact",
+  "label": "Contact",
+  "section": "contact",
+  "configSchema": [
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Contact" }
+  ]
+}

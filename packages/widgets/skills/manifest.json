@@ -1,0 +1,8 @@
+{
+  "key": "skills",
+  "label": "Skills",
+  "section": "skills",
+  "configSchema": [
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Skills" }
+  ]
+}

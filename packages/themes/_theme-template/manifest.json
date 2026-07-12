@@ -1,0 +1,15 @@
+{
+  "id": "REPLACE_ME_UNIQUE_ID",
+  "name": "Replace Me Theme Name",
+  "domainTags": ["general"],
+  "defaultWidgetKeys": {
+    "about": "about",
+    "skills": "skills",
+    "gallery": "gallery",
+    "experience-timeline": "experience-timeline"
+  },
+  "palettes": ["default"],
+  "defaultPalette": "default",
+  "isPremium": true,
+  "priceInPaise": 5000
+}

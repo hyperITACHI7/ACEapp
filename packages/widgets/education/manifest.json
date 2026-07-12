@@ -1,0 +1,8 @@
+{
+  "key": "education",
+  "label": "Education",
+  "section": "education",
+  "configSchema": [
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Education" }
+  ]
+}

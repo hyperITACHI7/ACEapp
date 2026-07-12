@@ -1,0 +1,8 @@
+{
+  "key": "education-animated",
+  "label": "Education (Motion Compact)",
+  "section": "education",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Education" }
+  ]
+}

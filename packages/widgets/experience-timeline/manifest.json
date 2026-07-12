@@ -1,0 +1,8 @@
+{
+  "key": "experience-timeline",
+  "label": "Experience Timeline",
+  "section": "experience-timeline",
+  "configSchema": [
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Experience" }
+  ]
+}

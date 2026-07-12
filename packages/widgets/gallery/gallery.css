@@ -1,0 +1,104 @@
+.widget-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.widget-gallery-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Sized/positioned override on top of the shared dashed-button baseline in
+ * packages/widgets/_shared/shared-widgets.css. */
+.widget-gallery-add {
+  border-radius: 8px;
+  padding: 0.75rem;
+  min-height: 150px;
+}
+
+.widget-gallery-image-wrap {
+  position: relative;
+}
+
+.widget-gallery-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+  background: var(--border);
+}
+
+.widget-gallery-image--placeholder {
+  background: repeating-linear-gradient(45deg, var(--border), var(--border) 10px, transparent 10px, transparent 20px);
+}
+
+.widget-gallery-photo-btn {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+}
+
+.widget-gallery-photo-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+/* Sized/positioned override on top of the shared baseline in
+ * packages/widgets/_shared/shared-widgets.css. */
+.widget-gallery-remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+
+.widget-gallery-warning {
+  margin: 0.5rem 0.75rem 0;
+  font-size: 0.75rem;
+  color: var(--destructive, #ef4444);
+}
+
+.widget-gallery-title {
+  margin: 0.75rem 0.75rem 0.25rem;
+  font-size: 1rem;
+}
+
+.widget-gallery-date {
+  display: block;
+  margin: 0 0.75rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.widget-gallery-desc {
+  margin: 0 0.75rem 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.widget-gallery-link {
+  display: block;
+  margin: 0 0.75rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.widget-gallery-link--editable:empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.6;
+}

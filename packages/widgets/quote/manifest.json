@@ -1,0 +1,8 @@
+{
+  "key": "quote",
+  "label": "Quote",
+  "section": "quote",
+  "configSchema": [
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Quote" }
+  ]
+}

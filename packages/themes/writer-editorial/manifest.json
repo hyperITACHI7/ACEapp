@@ -1,0 +1,10 @@
+{
+  "id": "writer-editorial",
+  "name": "Writer Editorial",
+  "domainTags": ["writing", "journalism", "content", "editorial"],
+  "defaultWidgetKeys": { "about": "about", "experience-timeline": "experience-timeline", "skills": "skills" },
+  "palettes": ["paper", "ink"],
+  "defaultPalette": "paper",
+  "isPremium": true,
+  "priceInPaise": 5000
+}

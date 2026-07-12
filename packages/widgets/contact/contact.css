@@ -1,0 +1,65 @@
+.widget-contact-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.widget-contact-location {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.widget-contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.widget-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.widget-contact-platform {
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 80px;
+}
+
+.widget-contact-url {
+  font-size: 0.8rem;
+  color: var(--muted);
+  flex: 1;
+}
+
+.widget-contact-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.widget-contact-remove {
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.widget-contact-add {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0.4rem 0.9rem;
+  font: inherit;
+}

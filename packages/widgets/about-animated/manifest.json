@@ -1,0 +1,10 @@
+{
+  "key": "about-animated",
+  "label": "About (Motion Stats)",
+  "section": "about",
+  "lockedWidth": true,
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "About Me" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "A closer look\nat the details" }
+  ]
+}

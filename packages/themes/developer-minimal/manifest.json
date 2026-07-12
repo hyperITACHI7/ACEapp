@@ -1,0 +1,15 @@
+{
+  "id": "developer-minimal",
+  "name": "Developer Minimal",
+  "domainTags": ["engineering", "software", "developer", "programming"],
+  "defaultWidgetKeys": {
+    "about": "about",
+    "skills": "skills",
+    "gallery": "gallery",
+    "experience-timeline": "experience-timeline"
+  },
+  "palettes": ["mono", "slate", "terminal-green"],
+  "defaultPalette": "mono",
+  "isPremium": false,
+  "priceInPaise": 0
+}

@@ -1,0 +1,8 @@
+{
+  "key": "gallery-cards",
+  "label": "Gallery (Tag Cards)",
+  "section": "gallery",
+  "configSchema": [
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Work" }
+  ]
+}

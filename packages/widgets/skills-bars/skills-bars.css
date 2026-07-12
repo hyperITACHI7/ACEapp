@@ -1,0 +1,67 @@
+.widget-skills-bars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.widget-skills-bar-row {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.widget-skills-bar-name {
+  font-size: 0.85rem;
+}
+
+.widget-skills-bar-track {
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent, #3b82f6) 15%, transparent);
+  overflow: hidden;
+}
+
+.widget-skills-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent, #3b82f6);
+  transition: width 0.3s ease;
+}
+
+.widget-skills-bar-pct {
+  font-size: 0.75rem;
+  color: var(--muted);
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+.widget-skills-bar-slider {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: var(--accent, #3b82f6);
+}
+
+.widget-skills-bar-remove {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.35rem;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.widget-skills-bar-add {
+  margin-top: 0.75rem;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font: inherit;
+}

@@ -1,0 +1,74 @@
+/* Foundational classes used across most widget packages — no single widget owns these (the
+ * base `skills` widget itself has no dedicated CSS file at all beyond what's here). Moved out of
+ * apps/web/src/app/globals.css so editing one widget's own styling never touches this file. */
+
+.widget-heading {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+}
+
+.widget-empty {
+  color: var(--muted, #6b7280);
+  font-size: 0.9rem;
+}
+
+.widget-text {
+  line-height: 1.6;
+}
+
+.widget-skills-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+}
+
+.widget-skill-tag {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative accent underline — cosmetic only, no proficiency data backs this. */
+.widget-skill-tag::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0.6;
+}
+
+/* One rule spanning 3 different widgets' "add" buttons (skills, experience-timeline, gallery) —
+ * kept together here rather than forked 3 ways since it's the same baseline look by design. */
+.widget-skill-tag--add button,
+.widget-timeline-add,
+.widget-gallery-add {
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+}
+
+.widget-skill-remove,
+.widget-gallery-remove {
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  line-height: 1;
+  font-size: 1rem;
+  padding: 0;
+}

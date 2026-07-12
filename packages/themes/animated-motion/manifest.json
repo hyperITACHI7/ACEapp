@@ -1,0 +1,18 @@
+{
+  "id": "animated-motion",
+  "name": "Animated Motion",
+  "domainTags": ["design", "creative", "portfolio", "motion", "developer"],
+  "defaultWidgetKeys": {
+    "about": "about-animated",
+    "skills": "skills-marquee",
+    "gallery": "gallery-animated",
+    "experience-timeline": "experience-timeline-animated",
+    "education": "education-animated",
+    "awards": "awards-animated",
+    "contact": "contact-animated"
+  },
+  "palettes": ["default"],
+  "defaultPalette": "default",
+  "isPremium": false,
+  "priceInPaise": 0
+}

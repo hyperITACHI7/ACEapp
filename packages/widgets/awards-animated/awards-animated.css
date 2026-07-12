@@ -1,0 +1,47 @@
+.widget-awards-animated-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.widget-awards-animated-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.widget-awards-animated-row:last-child {
+  border-bottom: none;
+}
+
+.widget-awards-animated-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.widget-awards-animated-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.widget-awards-animated-context {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.widget-awards-animated-year {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.widget-awards-animated-year-edit {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--muted);
+}

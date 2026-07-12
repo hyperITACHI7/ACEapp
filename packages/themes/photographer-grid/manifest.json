@@ -1,0 +1,10 @@
+{
+  "id": "photographer-grid",
+  "name": "Photographer Grid",
+  "domainTags": ["photography", "visual-arts", "design"],
+  "defaultWidgetKeys": { "about": "about", "gallery": "gallery", "skills": "skills" },
+  "palettes": ["gallery-white", "gallery-black"],
+  "defaultPalette": "gallery-white",
+  "isPremium": true,
+  "priceInPaise": 5000
+}

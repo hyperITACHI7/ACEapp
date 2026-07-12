@@ -1,0 +1,68 @@
+.widget-experience-animated-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.widget-experience-animated-entry {
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.widget-experience-animated-head {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+@media (min-width: 640px) {
+  .widget-experience-animated-head {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.widget-experience-animated-role {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.widget-experience-animated-org {
+  font-family: var(--font-body, inherit);
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--accent-2, var(--accent));
+  margin-top: 0.15rem;
+}
+
+.widget-experience-animated-dates {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.widget-experience-animated-desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.widget-experience-animated-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.widget-experience-animated-tag {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+}

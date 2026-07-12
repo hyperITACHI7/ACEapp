@@ -1,0 +1,255 @@
+.widget-gallery-animated-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .widget-gallery-animated-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.widget-gallery-animated-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--card, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: border-color 0.3s ease;
+}
+
+.widget-gallery-animated-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.widget-gallery-animated-image-wrap {
+  position: relative;
+  overflow: hidden;
+  height: clamp(220px, 28vw, 320px);
+  background: var(--card, #0e0e1c);
+}
+
+.widget-gallery-animated-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.75) saturate(0.9);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.widget-gallery-animated-card:hover .widget-gallery-animated-image {
+  transform: scale(1.05);
+}
+
+.widget-gallery-animated-image--placeholder {
+  background: var(--border);
+}
+
+.widget-gallery-animated-content {
+  padding: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.widget-gallery-animated-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.widget-gallery-animated-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.widget-gallery-animated-index {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--accent);
+}
+
+.widget-gallery-animated-date {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.widget-gallery-animated-title {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.widget-gallery-animated-desc {
+  font-size: 0.875rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.widget-gallery-animated-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.15rem;
+}
+
+.widget-gallery-animated-tag {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+}
+
+.widget-gallery-animated-link {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  color: var(--fg);
+  text-decoration: none;
+  margin-top: 0.2rem;
+}
+
+.widget-gallery-animated-link:hover {
+  text-decoration: underline;
+}
+
+.widget-gallery-animated-arrow {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--fg);
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.widget-gallery-animated-card:hover .widget-gallery-animated-arrow {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg, #07070f);
+}
+
+/* Size-adaptive rendering. A narrow (w=1) placement always shows a single column regardless of
+   viewport, since the widget itself only occupies half the row — the two-class combinator here
+   beats the plain media-query rule above regardless of source order, without needing !important. */
+.widget-gallery-animated-grid.widget-gallery-animated-grid--narrow {
+  grid-template-columns: 1fr;
+}
+
+.widget-gallery-animated-scroller {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 1.5rem;
+  padding-bottom: 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.widget-gallery-animated-scroller::-webkit-scrollbar {
+  height: 6px;
+}
+
+.widget-gallery-animated-scroller::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+.widget-gallery-animated-scroller > .widget-gallery-animated-grid {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+}
+
+.widget-gallery-animated-viewall-btn {
+  margin-top: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  padding: 0.6rem 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.widget-gallery-animated-viewall-btn:hover {
+  background: var(--accent);
+  color: var(--bg, #07070f);
+}
+
+/* "View All" overlay — a themed modal (not ui-kit's Dialog, which is deliberately hardcoded dark
+   for the app's own editor/dashboard chrome) so it matches whatever palette is active. Layered
+   above the whole page rather than expanding the widget in place. */
+.widget-gallery-animated-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg, #07070f) 75%, transparent);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+}
+
+.widget-gallery-animated-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 101;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(1.5rem, 5vw, 4rem) 1.5rem;
+  overflow-y: auto;
+}
+
+.widget-gallery-animated-overlay-panel {
+  width: min(960px, 100%);
+  background: var(--bg, #07070f);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.widget-gallery-animated-overlay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.widget-gallery-animated-overlay-title {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.widget-gallery-animated-overlay-close {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  color: var(--fg);
+  cursor: pointer;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.widget-gallery-animated-overlay-close:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg, #07070f);
+}

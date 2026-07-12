@@ -1,0 +1,446 @@
+/* animated-motion theme: shell (cursor, ambient background, nav, hero, footer)
+ * Measurements/timings below are deliberately matched to the reference design this theme
+ * recreates (container widths, orb positions/keyframes, cursor size/blend, type scale) —
+ * hardcoded here rather than palette-driven since this is this theme's own visual identity. */
+
+.theme-animated-motion {
+  /* Deliberately no `overflow` here — that would make this element (rather than the real
+     scroll container) the sticky-positioning context and break the nav's `position: sticky`.
+     Horizontal clipping for the ambient orbs/marquee is handled locally by those elements. */
+  position: relative;
+  isolation: isolate;
+  font-family: var(--font-body, inherit);
+}
+
+.theme-animated-motion--cursor,
+.theme-animated-motion--cursor * {
+  cursor: none !important;
+}
+
+@media (pointer: coarse) {
+  .theme-cursor {
+    display: none !important;
+  }
+  .theme-animated-motion--cursor,
+  .theme-animated-motion--cursor * {
+    cursor: auto !important;
+  }
+}
+
+/* Outer wrapper: mix-blend-mode inverts whatever it overlaps (the "negative" effect), and is
+ * the element whose left/top get lerp-smoothed toward the pointer every frame. */
+.theme-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  transform: translate(-50%, -50%);
+  will-change: left, top;
+}
+
+.theme-cursor-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.25s ease, height 0.25s ease;
+}
+
+.theme-cursor--hover .theme-cursor-dot {
+  width: 52px;
+  height: 52px;
+}
+
+.theme-ambient {
+  /* `absolute`, not `fixed` — this must stay confined to the theme's own box (sized to its
+     full scrollable content height via the `.theme-animated-motion` positioned ancestor).
+     `fixed` would escape that box and bleed across the surrounding app chrome, since none of
+     the editor's wrapper divs establish a containing block for fixed descendants. */
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.theme-ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.theme-ambient-orb--a {
+  top: 20%;
+  left: 15%;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(93, 95, 239, 0.25) 0%, transparent 70%);
+  animation: theme-drift-1 9s ease-in-out infinite;
+}
+
+.theme-ambient-orb--b {
+  bottom: 20%;
+  right: 10%;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(200, 241, 53, 0.12) 0%, transparent 70%);
+  animation: theme-drift-2 12s ease-in-out infinite;
+}
+
+.theme-ambient-orb--c {
+  top: 55%;
+  right: 30%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(232, 121, 249, 0.15) 0%, transparent 70%);
+  animation: theme-drift-3 10s ease-in-out infinite;
+}
+
+@keyframes theme-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -60px) scale(1.1); }
+  66% { transform: translate(-30px, 40px) scale(0.95); }
+}
+
+@keyframes theme-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40% { transform: translate(-50px, 30px) scale(1.05); }
+  70% { transform: translate(60px, -40px) scale(0.9); }
+}
+
+@keyframes theme-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, 50px) scale(1.1); }
+}
+
+.theme-ambient-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-ambient-orb {
+    animation: none;
+  }
+}
+
+.theme-scroll-sentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.theme-nav--animated {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background-color 0.5s ease, border-color 0.5s ease, backdrop-filter 0.5s ease;
+}
+
+.theme-nav--scrolled {
+  background: rgba(7, 7, 15, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+.theme-nav-inner {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (min-width: 1024px) {
+  .theme-nav-inner {
+    padding: 0 3rem;
+  }
+}
+
+.theme-nav-brand {
+  font-family: var(--font-heading, inherit);
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--fg);
+}
+
+.theme-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.theme-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.theme-nav-link {
+  display: none;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.875rem;
+  text-decoration: none;
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+@media (min-width: 768px) {
+  .theme-nav-link {
+    display: block;
+  }
+}
+
+.theme-nav-link:hover {
+  color: var(--fg);
+}
+
+.theme-nav-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-nav-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  animation: theme-pulse 2s ease-in-out infinite;
+}
+
+.theme-nav-status span:last-child {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--accent);
+}
+
+@keyframes theme-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.theme-header--animated {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.theme-header-inner {
+  position: relative;
+  z-index: 10;
+  max-width: 80rem;
+  margin: 0 auto;
+  width: 100%;
+  padding: 7rem 1.5rem 4rem;
+}
+
+@media (min-width: 1024px) {
+  .theme-header-inner {
+    padding: 7rem 3rem 4rem;
+  }
+}
+
+.theme-eyebrow {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.theme-hero-eyebrow {
+  margin-bottom: 2rem;
+}
+
+.theme-name--display {
+  font-family: var(--font-heading, inherit);
+  font-size: clamp(4.5rem, 14vw, 12rem);
+  font-weight: 800;
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+  margin: 0 0 2.5rem;
+  overflow: hidden;
+}
+
+.theme-name-letter-wrap {
+  display: inline-block;
+  overflow: hidden;
+}
+
+.theme-name-letter {
+  display: inline-block;
+}
+
+.theme-hero-row {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .theme-hero-row {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+}
+
+/* Renamed from the shared/generic `.theme-headline` (packages/themes/_shared/shared-themes.css)
+ * — this theme's own hero headline has entirely different rules (size/max-width/weight) and was
+ * previously a same-named duplicate selector that only "worked" by accident of source order. */
+.theme-headline--animated {
+  font-size: 1.25rem;
+  max-width: 28rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .theme-headline--animated {
+    font-size: 1.5rem;
+  }
+}
+
+.theme-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.theme-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.theme-hero-btn--solid {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.theme-hero-btn--outline {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--fg);
+}
+
+.theme-hero-btn:hover {
+  opacity: 0.8;
+}
+
+.theme-scroll-cue {
+  margin-top: 6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+}
+
+.theme-scroll-cue-line {
+  width: 2.5rem;
+  height: 1px;
+  background: var(--border);
+}
+
+.theme-scroll-cue-arrow {
+  display: inline-block;
+  animation: theme-bounce 1.4s ease-in-out infinite;
+}
+
+@keyframes theme-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+.theme-slot--animated {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 5rem 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .theme-slot--animated {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .theme-slot--animated {
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+  }
+}
+
+.theme-slot--flush {
+  max-width: none;
+  padding: 0;
+}
+
+.theme-footer--animated {
+  border-top: 1px solid var(--border);
+  padding: 2rem 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.theme-footer-inner {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .theme-footer-inner {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 1024px) {
+  .theme-footer-inner {
+    padding: 0 3rem;
+  }
+}
+
+.theme-footer-top {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.theme-footer-top:hover {
+  color: var(--accent);
+}

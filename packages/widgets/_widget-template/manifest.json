@@ -1,0 +1,8 @@
+{
+  "key": "replace-me-unique-key",
+  "label": "Replace Me Label",
+  "section": "replace-me-section-id",
+  "configSchema": [
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Section" }
+  ]
+}

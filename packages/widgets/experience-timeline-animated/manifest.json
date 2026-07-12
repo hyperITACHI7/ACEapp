@@ -1,0 +1,8 @@
+{
+  "key": "experience-timeline-animated",
+  "label": "Experience (Motion Bordered)",
+  "section": "experience-timeline",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Work Experience" }
+  ]
+}

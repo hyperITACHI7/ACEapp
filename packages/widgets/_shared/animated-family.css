@@ -1,0 +1,44 @@
+/* "Animated Motion widget family" — shared visual language matched to the reference this theme
+ * recreates: mono uppercase eyebrow labels, bold Bricolage headings, an accent (lime) vs
+ * accent-2 (indigo) split for "column label" vs "linked/dated" text. All transparent-background
+ * so they still blend reasonably into any other theme; `--font-*`/`--accent-2` fall back
+ * gracefully there. Used by 6 different `*-animated` widgets — no single one owns this file. */
+
+.widget-eyebrow {
+  display: block;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.widget-eyebrow--accent {
+  color: var(--accent);
+  margin-bottom: 2rem;
+}
+
+.widget-heading--animated {
+  font-family: var(--font-heading, inherit);
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0 0 1rem;
+}
+
+.widget-heading-line--accent {
+  color: var(--accent);
+  display: block;
+}
+
+.widget-heading--animated-cta {
+  font-family: var(--font-heading, inherit);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin: 0 0 1.5rem;
+}

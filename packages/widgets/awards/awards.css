@@ -1,0 +1,68 @@
+.widget-awards-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.widget-awards-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.widget-awards-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.widget-awards-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.widget-awards-context {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.widget-awards-side {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.widget-awards-year {
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.widget-awards-remove {
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.widget-awards-add {
+  align-self: flex-start;
+  margin-top: 0.75rem;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font: inherit;
+}

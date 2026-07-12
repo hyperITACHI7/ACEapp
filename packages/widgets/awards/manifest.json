@@ -1,0 +1,8 @@
+{
+  "key": "awards",
+  "label": "Awards",
+  "section": "awards",
+  "configSchema": [
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Awards & Recognition" }
+  ]
+}

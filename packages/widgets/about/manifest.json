@@ -1,0 +1,8 @@
+{
+  "key": "about",
+  "label": "About",
+  "section": "about",
+  "configSchema": [
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "About" }
+  ]
+}

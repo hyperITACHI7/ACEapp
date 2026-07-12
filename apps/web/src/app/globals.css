@@ -1,0 +1,198 @@
+@import "tailwindcss";
+
+/* Every @import below MUST stay grouped here, immediately after the one above — the CSS spec
+ * requires all @import rules to precede any other rule in the stylesheet (browsers/parsers
+ * silently ignore an @import that appears after a normal rule). These pull in every widget's and
+ * theme's own CSS file, colocated in its package (packages/widgets/<key>/<key>.css,
+ * packages/themes/<id>/<id>.css) plus the editor's own outline-sidebar.css — a plain CSS @import
+ * sidesteps Next's "global CSS can only be imported from the root layout" restriction, which a
+ * JS-level `import "./x.css"` from inside a workspace package would otherwise trip. Genuinely
+ * shared primitives (used by several widgets/themes with no single owner) live in
+ * packages/widgets/_shared/ and packages/themes/_shared/. See the longer note further down (at
+ * the point these used to be inlined) for what's still deliberately kept in this file. */
+@import "../../../../packages/themes/_shared/shared-themes.css";
+@import "../../../../packages/widgets/_shared/shared-widgets.css";
+@import "../../../../packages/widgets/gallery/gallery.css";
+@import "../../../../packages/widgets/experience-timeline/experience-timeline.css";
+@import "../../../../packages/themes/multi-domain-cards/multi-domain-cards.css";
+@import "../../../../packages/widgets/stats/stats.css";
+@import "../../../../packages/widgets/quote/quote.css";
+@import "../../../../packages/widgets/contact/contact.css";
+@import "../../../../packages/themes/animated-motion/animated-motion.css";
+@import "../../../../packages/widgets/education/education.css";
+@import "../../../../packages/widgets/awards/awards.css";
+@import "../../../../packages/widgets/skills-bars/skills-bars.css";
+@import "../../../../packages/widgets/gallery-cards/gallery-cards.css";
+@import "../../../../packages/widgets/contact-cards/contact-cards.css";
+@import "../../../../packages/widgets/_shared/animated-family.css";
+@import "../../../../packages/widgets/about-animated/about-animated.css";
+@import "../../../../packages/widgets/gallery-animated/gallery-animated.css";
+@import "../../../../packages/widgets/experience-timeline-animated/experience-timeline-animated.css";
+@import "../../../../packages/widgets/education-animated/education-animated.css";
+@import "../../../../packages/widgets/awards-animated/awards-animated.css";
+@import "../../../../packages/widgets/skills-marquee/skills-marquee.css";
+@import "../../../../packages/widgets/contact-animated/contact-animated.css";
+@import "../../../../packages/widgets/divider/divider.css";
+@import "./(app)/editor/outline-sidebar.css";
+
+/* NOTE: Tailwind v4's automatic content scanner only walks apps/web — it never sees class names
+   used exclusively inside sibling workspace packages like @portfolio/ui-kit (this monorepo's
+   `@source` directive did not pick them up in testing, in either directory-glob or inline() form).
+   Any component in packages/ui-kit (or other workspace packages) that needs a Tailwind utility
+   not already used verbatim somewhere in apps/web's own source should use an inline style instead
+   for that specific property — see packages/ui-kit/src/Dialog.tsx for the pattern. */
+
+/* Design tokens ported from the imported Login Page design (Login Page/src/styles/theme.css) —
+   this app is fully dark, no light/dark toggle, so the source's `.dark` overrides are dropped. */
+:root {
+  --background: #08080f;
+  --foreground: #f0f0ff;
+  --card: rgba(18, 18, 30, 0.85);
+  --card-foreground: #f0f0ff;
+  --popover: #12121e;
+  --popover-foreground: #f0f0ff;
+  --primary: #a855f7;
+  --primary-foreground: #ffffff;
+  --secondary: #1e1e2e;
+  --secondary-foreground: #c4c4dc;
+  --muted: #1a1a28;
+  --muted-foreground: #7878a0;
+  --accent: #06b6d4;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(168, 85, 247, 0.15);
+  --input: rgba(255, 255, 255, 0.05);
+  --ring: rgba(168, 85, 247, 0.5);
+  --radius: 0.625rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Wired to next/font CSS variables set on <html> in layout.tsx */
+  --font-sans: var(--font-plus-jakarta), ui-sans-serif, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+}
+
+::selection {
+  background: rgba(168, 85, 247, 0.35);
+}
+
+/* ============================================================================
+ * Public portfolio render styles — NOT part of the app redesign.
+ * These class names are referenced literally by packages/themes/* and
+ * packages/widgets/* component markup (the end-user-facing portfolio templates,
+ * a deliberately separate design system from the builder app's own chrome).
+ * The actual rules now live colocated with the widget/theme package that owns
+ * them (packages/widgets/<key>/<key>.css, packages/themes/<id>/<id>.css),
+ * pulled in via the @import block at the very top of this file — see the note
+ * there for why. Genuinely shared primitives (used by several widgets/themes
+ * with no single owner) live in packages/widgets/_shared/ and
+ * packages/themes/_shared/. Do not restyle any of them to match the app's own
+ * dark/glass chrome — it's a deliberately separate design system.
+ * ==========================================================================*/
+
+/* Hides a scrollable element's native scrollbar while keeping it scrollable — applied to the
+ * editor's outline/canvas/widget-drawer panels and the outline's own card grid. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* The whole portfolio's widget layout: one continuous 2-column grid every widget lives in
+ * (see resolveGridLayout in @portfolio/schema and apps/web/src/lib/portfolioRenderer.tsx).
+ * Row height is `auto` — sized to each row's tallest member — so nothing inside the rendered
+ * portfolio ever needs its own scrollbar. */
+.theme-widget-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: auto;
+  gap: 2rem;
+}
+
+.theme-widget-grid-item {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .theme-widget-grid {
+    grid-template-columns: 1fr;
+  }
+  .theme-widget-grid-item {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+/* ============================================================================
+ * Editor inline-edit affordance — layered onto the portfolio render output
+ * ONLY when EditorModeContext.editing is true (never on the public page).
+ * Deliberately theme-agnostic (currentColor/outline) so it reads consistently
+ * across every theme's palette without touching packages/themes/*.
+ * ==========================================================================*/
+
+.is-editable {
+  cursor: text;
+  border-radius: 4px;
+  outline: 1px dashed transparent;
+  outline-offset: 4px;
+  transition: outline-color 0.15s ease, background-color 0.15s ease;
+}
+
+.is-editable:hover {
+  outline-color: color-mix(in srgb, currentColor 35%, transparent);
+}
+
+.is-editable:focus {
+  outline: 1px solid var(--accent, #06b6d4);
+  outline-offset: 4px;
+  background-color: color-mix(in srgb, var(--accent, #06b6d4) 8%, transparent);
+}
+
+[data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.5;
+  pointer-events: none;
+}

@@ -1,0 +1,117 @@
+/* Shared theme-shell primitives used by all 6 themes (only animated-motion opts out of some of
+ * these in favor of its own equivalents — see packages/themes/animated-motion/animated-motion.css).
+ * No single theme owns this file. */
+
+.theme {
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100vh;
+}
+
+.theme-header {
+  padding: 3rem 1.5rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.theme-header--minimal {
+  font-family: var(--font-mono, inherit);
+}
+
+.theme-header--centered {
+  text-align: center;
+}
+
+.theme-header--split {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.theme-header--editorial {
+  font-family: var(--font-serif, Georgia, serif);
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.theme-name {
+  margin: 0 0 0.35rem;
+  font-size: 2rem;
+}
+
+.theme-headline {
+  margin: 0 0 0.5rem;
+  color: var(--accent);
+}
+
+.theme-bio {
+  margin: 0.5rem 0;
+  color: var(--muted);
+  max-width: 640px;
+}
+
+.theme-bio--lead {
+  font-size: 1.05rem;
+  margin: 1rem auto;
+}
+
+.theme-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.theme-avatar--square {
+  border-radius: 8px;
+  width: 120px;
+  height: 120px;
+}
+
+.theme-social-links {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.theme-social-links a {
+  text-decoration: none;
+  color: var(--accent);
+}
+
+.theme-body {
+  padding: 1.5rem;
+}
+
+.theme-body--stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.theme-body--narrow {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.theme-slot {
+  /* No border here deliberately — section-to-section dividers are opt-in via the standalone
+     Divider widget, not baked into every theme's section wrapper. */
+  padding-top: 1.5rem;
+}
+
+.theme-slot--gallery {
+  padding: 0 1.5rem;
+}
+
+.theme-degraded-notice {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: #6b7280;
+}

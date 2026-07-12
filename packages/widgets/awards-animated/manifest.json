@@ -1,0 +1,8 @@
+{
+  "key": "awards-animated",
+  "label": "Awards (Motion Compact)",
+  "section": "awards",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Recognition" }
+  ]
+}

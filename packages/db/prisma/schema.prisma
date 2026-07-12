@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  passwordHash          String
+  username              String?   @unique
+  usernameChangedAt     DateTime?
+  referralCode          String    @unique
+  referredByUserId      String?
+  referredBy            User?     @relation("Referrals", fields: [referredByUserId], references: [id])
+  referrals             User[]    @relation("Referrals")
+  creditBalance         Int       @default(0) // paise
+  onboardingState       Json?
+  onboardingCompletedAt DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  portfolios            Portfolio[]
+  sessions              Session[]
+  payments              Payment[]
+  referralsGiven        Referral[] @relation("ReferrerEvents")
+  referralsReceived     Referral[] @relation("RefereeEvents")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Portfolio {
+  id            String    @id @default(cuid())
+  userId        String // a user may have many portfolios; only one may be `published` at a time
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String    @default("Untitled Portfolio") // user-facing label in the portfolio list
+  username      String // denormalized from User.username (immutable — no rename flow exists),
+                          // shared across all of a user's portfolios; the public page filters by
+                          // `published: true` in addition to this, so it's not unique per-row
+  data          Json // draft PortfolioData (editor working copy)
+  publishedData Json? // last known-good published snapshot; SOLE source for public render
+  published     Boolean   @default(false)
+  schemaVersion Int       @default(1)
+  version       Int       @default(1) // optimistic-concurrency counter for stale-edit detection
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  analyticsEvents AnalyticsEvent[]
+  rollups         AnalyticsDailyRollup[]
+
+  @@index([userId])
+  @@index([username, published])
+}
+
+enum PaymentStatus {
+  CREATED
+  PAID_UNFULFILLED
+  FULFILLED
+  FAILED
+  REFUNDED
+}
+
+model Payment {
+  id                 String        @id @default(cuid())
+  userId             String
+  user               User          @relation(fields: [userId], references: [id])
+  themeId            String
+  amount             Int // paise (net amount actually charged)
+  creditApplied      Int           @default(0) // paise deducted from user's own credit balance
+  currency           String        @default("INR")
+  status             PaymentStatus @default(CREATED)
+  idempotencyKey     String        @unique
+  razorpayOrderId    String?       @unique
+  razorpayPaymentId  String?       @unique
+  razorpaySignature  String?
+  webhookReceivedAt  DateTime?
+  fulfilledAt        DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  referralEvent      Referral?
+
+  @@index([userId])
+}
+
+enum ReferralStatus {
+  PENDING
+  CREDITED
+  BLOCKED_SELF
+}
+
+model Referral {
+  id                  String         @id @default(cuid())
+  referrerUserId      String
+  referrer            User           @relation("ReferrerEvents", fields: [referrerUserId], references: [id])
+  refereeUserId       String
+  referee             User           @relation("RefereeEvents", fields: [refereeUserId], references: [id])
+  triggeringPaymentId String?        @unique
+  triggeringPayment   Payment?       @relation(fields: [triggeringPaymentId], references: [id])
+  status              ReferralStatus @default(PENDING)
+  referrerCredit      Int            @default(0)
+  refereeCredit        Int            @default(0)
+  createdAt           DateTime       @default(now())
+  creditedAt          DateTime?
+
+  @@unique([referrerUserId, refereeUserId])
+}
+
+model AnalyticsEvent {
+  id          String    @id @default(cuid())
+  portfolioId String
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  type        String    @default("page_view")
+  visitorHash String // sha256(ip+ua+day-salt), never raw IP
+  isBot       Boolean   @default(false)
+  path        String
+  referrer    String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+
+  @@index([portfolioId, createdAt])
+}
+
+model AnalyticsDailyRollup {
+  id             String    @id @default(cuid())
+  portfolioId    String
+  portfolio      Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  date           DateTime // truncated to day
+  views          Int       @default(0)
+  uniqueVisitors Int       @default(0)
+  createdAt      DateTime  @default(now())
+
+  @@unique([portfolioId, date])
+}
+
+model GithubRepoCache {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  reposJson   Json
+  profileJson Json?
+  fetchedAt   DateTime @default(now())
+}

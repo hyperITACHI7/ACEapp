@@ -1,0 +1,8 @@
+{
+  "key": "gallery",
+  "label": "Gallery",
+  "section": "gallery",
+  "configSchema": [
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Work" }
+  ]
+}

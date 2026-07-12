@@ -1,0 +1,9 @@
+{
+  "key": "gallery-animated",
+  "label": "Gallery (Motion Index)",
+  "section": "gallery",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Selected Work" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Projects I'm\nproud of" }
+  ]
+}

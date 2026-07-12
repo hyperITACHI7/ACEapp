@@ -1,0 +1,158 @@
+/* Outline sidebar: the same 2-column grid the rendered portfolio uses, but as an editing tool —
+ * plain icon+label cards (react-grid-layout), resized by dragging a corner, repositioned by
+ * dragging the card, visibility toggled by clicking it (a "drag" that ends where it started). */
+.outline-grid-wrapper {
+  overflow: visible;
+}
+
+.outline-grid {
+  overflow: visible;
+}
+
+.outline-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+}
+
+.outline-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.outline-card--disabled {
+  opacity: 0.4;
+}
+
+/* Dragged past the sidebar's own bounds — dropping here permanently deletes the widget instead
+ * of repositioning/resizing it. */
+.outline-card--delete-pending {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.7);
+}
+
+.outline-card--delete-pending .outline-card-label {
+  color: rgb(248, 113, 113);
+}
+
+.outline-card--delete-pending .outline-card-icon {
+  background: rgba(239, 68, 68, 0.25) !important;
+  color: rgb(248, 113, 113) !important;
+}
+
+.outline-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.outline-card-label {
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Resize corners. Only the bottom-right (react-resizable's real "se" handle) actually resizes —
+ * react-grid-layout never moves an item's own (x, y) anchor during a resize, so a "nw"/"ne"/"sw"
+ * handle would visibly grow the card in the opposite direction from whichever corner was
+ * dragged. The other three corners below (`.outline-card-corner--nw/ne/sw`) are plain decorative
+ * spans, hover-only, never wired to any drag logic — they exist purely so all 4 corners read as
+ * a consistent, symmetric set of "grabbable" cues even though only one is functional.
+ *
+ * Both react-resizable's AND react-grid-layout's own bundled stylesheets style the real handle
+ * with a barely-visible, diagonally-ROTATED 20px corner glyph plus a decorative `::after` tick —
+ * react-grid-layout's copy is scoped via `.react-grid-item > .react-resizable-handle.react-
+ * resizable-handle-se` (3 classes), which beats a plain 2-class override regardless of source
+ * order, hence the `.outline-grid-wrapper .outline-card` prefix throughout to out-specificity it.
+ *
+ * All 4 corners are invisible at rest. Hovering anywhere on the card fades all 4 in at low
+ * opacity (there are 4 grabbable-looking corners here); hovering one specific corner brings it
+ * to full opacity and fades the other 3 back out, via `:has()`. */
+.outline-grid-wrapper .outline-card .react-resizable-handle {
+  background-image: none;
+  background-color: transparent;
+  transform: none;
+  z-index: 5;
+}
+
+.outline-grid-wrapper .outline-card .react-resizable-handle::after {
+  display: none;
+}
+
+.outline-card {
+  position: relative;
+}
+
+.outline-card-corner,
+.outline-grid-wrapper .outline-card .react-resizable-handle.react-resizable-handle-se {
+  width: 18px;
+  height: 18px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.outline-card-corner {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.outline-card-corner--nw {
+  top: 0;
+  left: 0;
+  border-top: 2px solid var(--primary);
+  border-left: 2px solid var(--primary);
+  border-top-left-radius: 0.75rem;
+}
+
+.outline-card-corner--ne {
+  top: 0;
+  right: 0;
+  border-top: 2px solid var(--primary);
+  border-right: 2px solid var(--primary);
+  border-top-right-radius: 0.75rem;
+}
+
+.outline-card-corner--sw {
+  bottom: 0;
+  left: 0;
+  border-bottom: 2px solid var(--primary);
+  border-left: 2px solid var(--primary);
+  border-bottom-left-radius: 0.75rem;
+}
+
+.outline-grid-wrapper .outline-card .react-resizable-handle.react-resizable-handle-se {
+  bottom: 0;
+  right: 0;
+  border-right: 2px solid var(--primary);
+  border-bottom: 2px solid var(--primary);
+  border-bottom-right-radius: 0.75rem;
+  cursor: se-resize;
+}
+
+.outline-card:hover .outline-card-corner,
+.outline-card:hover .react-resizable-handle.react-resizable-handle-se {
+  opacity: 0.35;
+}
+
+.outline-card-corner:hover,
+.outline-card .react-resizable-handle.react-resizable-handle-se:hover {
+  opacity: 1 !important;
+}
+
+.outline-card:has(.outline-card-corner:hover) .outline-card-corner:not(:hover),
+.outline-card:has(.outline-card-corner:hover) .react-resizable-handle.react-resizable-handle-se,
+.outline-card:has(.react-resizable-handle-se:hover) .outline-card-corner {
+  opacity: 0 !important;
+}

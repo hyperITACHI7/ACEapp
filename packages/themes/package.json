@@ -1,0 +1,17 @@
+{
+  "name": "@portfolio/themes",
+  "version": "0.1.0",
+  "private": true,
+  "main": "registry.ts",
+  "types": "registry.ts",
+  "scripts": {
+    "validate": "tsx scripts/validateRegistry.ts"
+  },
+  "dependencies": {
+    "@portfolio/schema": "*",
+    "@portfolio/widgets": "*",
+    "@portfolio/ui-kit": "*",
+    "react": "^18.3.1",
+    "motion": "^12.23.24"
+  }
+}

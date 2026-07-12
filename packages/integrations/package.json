@@ -1,0 +1,11 @@
+{
+  "name": "@portfolio/integrations",
+  "version": "0.1.0",
+  "private": true,
+  "main": "registry.ts",
+  "types": "registry.ts",
+  "dependencies": {
+    "@portfolio/db": "*",
+    "@portfolio/schema": "*"
+  }
+}

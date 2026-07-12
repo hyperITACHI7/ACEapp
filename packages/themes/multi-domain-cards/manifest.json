@@ -1,0 +1,20 @@
+{
+  "id": "multi-domain-cards",
+  "name": "Multi-Domain Cards",
+  "domainTags": ["software", "finance", "healthcare", "education", "corporate"],
+  "defaultWidgetKeys": {
+    "about": "about",
+    "skills": "skills-bars",
+    "gallery": "gallery-cards",
+    "experience-timeline": "experience-timeline",
+    "stats": "stats",
+    "contact": "contact-cards",
+    "quote": "quote",
+    "education": "education",
+    "awards": "awards"
+  },
+  "palettes": ["software", "finance", "healthcare", "education", "corporate"],
+  "defaultPalette": "software",
+  "isPremium": false,
+  "priceInPaise": 0
+}

@@ -1,0 +1,8 @@
+{
+  "key": "stats",
+  "label": "Stats",
+  "section": "stats",
+  "configSchema": [
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "By the numbers" }
+  ]
+}

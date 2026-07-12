@@ -1,0 +1,15 @@
+{
+  "id": "architect-showcase",
+  "name": "Architect Showcase",
+  "domainTags": ["architecture", "engineering", "design"],
+  "defaultWidgetKeys": {
+    "about": "about",
+    "gallery": "gallery",
+    "experience-timeline": "experience-timeline",
+    "skills": "skills"
+  },
+  "palettes": ["concrete", "blueprint"],
+  "defaultPalette": "concrete",
+  "isPremium": true,
+  "priceInPaise": 5000
+}

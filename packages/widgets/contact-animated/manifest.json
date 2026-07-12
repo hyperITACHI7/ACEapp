@@ -1,0 +1,15 @@
+{
+  "key": "contact-animated",
+  "label": "Contact (Motion CTA)",
+  "section": "contact",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Get In Touch" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Let's create\nsomething new" },
+    {
+      "name": "lead",
+      "label": "Supporting line",
+      "type": "text",
+      "default": "Open to new projects and collaborations — I usually reply within a day or two."
+    }
+  ]
+}

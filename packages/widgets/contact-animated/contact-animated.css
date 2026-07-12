@@ -1,0 +1,84 @@
+.widget-contact-animated {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.widget-contact-animated-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(93, 95, 239, 0.15) 0%, transparent 70%);
+}
+
+.widget-contact-animated > * {
+  position: relative;
+  z-index: 1;
+}
+
+.widget-contact-animated-lead {
+  font-size: 1.125rem;
+  max-width: 28rem;
+  color: var(--muted);
+  margin: 0 0 1rem;
+}
+
+.widget-contact-animated-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 1.1rem;
+  color: var(--fg);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.widget-contact-animated-email:hover {
+  opacity: 0.7;
+}
+
+.widget-contact-animated-socials {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
+
+.widget-contact-animated-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--muted);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.widget-contact-animated-social:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.widget-contact-animated-social-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.widget-contact-animated-icon {
+  color: var(--accent-2, var(--accent));
+  display: flex;
+}

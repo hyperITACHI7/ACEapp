@@ -1,0 +1,12 @@
+{
+  "name": "@portfolio/jobs",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "dependencies": {
+    "@portfolio/db": "*",
+    "@portfolio/schema": "*",
+    "@portfolio/integrations": "*",
+    "razorpay": "^2.9.4"
+  }
+}
