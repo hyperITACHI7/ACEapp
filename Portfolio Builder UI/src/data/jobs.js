@@ -1,0 +1,38 @@
+export const jobs = [
+  {
+    id: 'j1',
+    title: 'Frontend Engineer',
+    company: 'Nimbus Labs',
+    location: 'Remote',
+    matchScore: 94,
+    tags: ['React', 'TypeScript', 'Remote'],
+    description: 'Build customer-facing product surfaces with a small, senior team.',
+  },
+  {
+    id: 'j2',
+    title: 'Product Designer',
+    company: 'Fieldnote',
+    location: 'Bengaluru, IN',
+    matchScore: 89,
+    tags: ['Figma', 'Design Systems'],
+    description: 'Own the design system and craft end-to-end product flows.',
+  },
+  {
+    id: 'j3',
+    title: 'Full-Stack Developer Intern',
+    company: 'Kestrel',
+    location: 'Remote',
+    matchScore: 85,
+    tags: ['Node', 'React', 'Internship'],
+    description: 'Ship real features across the stack alongside senior engineers.',
+  },
+  {
+    id: 'j4',
+    title: 'UI Engineer',
+    company: 'Hollow & Co',
+    location: 'Hybrid — Pune, IN',
+    matchScore: 77,
+    tags: ['Animation', 'CSS'],
+    description: 'Build motion-rich marketing and product experiences.',
+  },
+]

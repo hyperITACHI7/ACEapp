@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+@theme {
+  /* Aether design tokens — black/white/gray minimalist premium palette */
+  --color-surface: #171717;
+  --color-surface-dim: #0a0a0a;
+  --color-surface-bright: #313537;
+  --color-surface-container-lowest: #0a0a0a;
+  --color-surface-container-low: #181c1e;
+  --color-surface-container: #1c2022;
+  --color-surface-container-high: #262b2c;
+  --color-surface-container-highest: #313537;
+  --color-on-surface: #ffffff;
+  --color-on-surface-variant: #c4c7c8;
+  --color-inverse-surface: #ffffff;
+  --color-inverse-on-surface: #0a0a0a;
+  --color-outline: #444748;
+  --color-outline-variant: #262626;
+  --color-surface-tint: #ffffff;
+  --color-primary: #ffffff;
+  --color-on-primary: #0a0a0a;
+  --color-primary-container: #e0e3e5;
+  --color-on-primary-container: #0a0a0a;
+  --color-inverse-primary: #0a0a0a;
+  --color-secondary: #e0e3e5;
+  --color-on-secondary: #0a0a0a;
+  --color-secondary-container: #313537;
+  --color-on-secondary-container: #e0e3e5;
+  --color-tertiary: #ffffff;
+  --color-on-tertiary: #0a0a0a;
+  --color-tertiary-container: #ffffff;
+  --color-on-tertiary-container: #0a0a0a;
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+  --color-background: #0a0a0a;
+  --color-on-background: #ffffff;
+  --color-surface-variant: #262b2c;
+
+  /* Fonts */
+  --font-display: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  /* Folio landing page tokens (scoped to .folio-landing, kept verbatim from the source project) */
+  --color-ink: #0a0a0b;
+  --color-cream: #f5f2ec;
+  --tracking-tightest: -0.045em;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background-color: #0a0a0a;
+    color: var(--color-on-surface);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font-family: var(--font-body);
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: rgba(23, 23, 23, 0.6);
+    backdrop-filter: blur(24px);
+    border: 1px solid #262626;
+  }
+
+  .glass-panel {
+    background: rgba(23, 23, 23, 0.7);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(38, 38, 38, 0.5);
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    vertical-align: middle;
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  /* Folio landing page — scoped so it renders exactly as designed, isolated from the app's theme */
+  .folio-landing {
+    color: var(--color-cream);
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .folio-landing h1,
+  .folio-landing h2,
+  .folio-landing h3,
+  .folio-landing h4 {
+    font-family: inherit;
+    margin: revert;
+  }
+
+  .folio-landing p {
+    margin: revert;
+  }
+
+  .folio-landing ::selection {
+    background: rgba(255, 140, 120, 0.35);
+  }
+
+  .folio-landing .text-balance {
+    text-wrap: balance;
+  }
+
+  .folio-landing .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
