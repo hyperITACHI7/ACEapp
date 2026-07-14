@@ -8,22 +8,6 @@ import type { ThemeProps } from "../types";
 import manifest from "./manifest.json";
 import { palettes } from "./palettes";
 
-const SECTION_LABELS: Record<string, string> = {
-  about: "About",
-  skills: "Skills",
-  gallery: "Work",
-  "experience-timeline": "Experience",
-  stats: "Stats",
-  quote: "Quote",
-  contact: "Contact",
-  education: "Education",
-  awards: "Awards",
-};
-
-function sectionLabel(section: string): string {
-  return SECTION_LABELS[section] ?? section.charAt(0).toUpperCase() + section.slice(1);
-}
-
 function initialsFor(name: string): string {
   const initials = name
     .split(/\s+/)
@@ -172,18 +156,30 @@ export function AnimatedMotionComponent({ data, palette, slots }: ThemeProps) {
   const [scrolled, setSentinel] = useScrolledPastSentinel();
   const { profile } = data;
 
-  // Every widget now renders inside one combined "grid-root" slot (see portfolioRenderer.tsx),
-  // so section labels/anchors for the nav and hero CTAs are derived straight from `data.widgets`
-  // rather than from `slots` — each widget still gets its own `#portfolio-section-{key}` anchor
-  // div regardless, which is what these links point to.
-  const navEntries = new Map<string, string>();
-  for (const w of data.widgets) {
-    if (!w.visible) continue;
-    const section = getWidget(w.key)?.manifest.section;
-    if (section && !navEntries.has(section)) navEntries.set(section, w.key);
+  // The nav header shows one link per user-named, nav-visible section (see NavGroupSchema in
+  // @portfolio/schema and the Outline sidebar's section UI) — entirely user-defined, so an
+  // untouched portfolio shows no header links at all until the user creates a section (or
+  // `seedDefaultNavGroups` pre-populates sensible ones from existing widgets on first load).
+  // Anchors still point at `#portfolio-section-{key}` (every widget always gets that id div,
+  // see portfolioRenderer.tsx), just resolved via a section's first visible member now instead
+  // of straight from `data.widgets`.
+  const orderedWidgets = [...data.widgets].sort((a, b) => a.order - b.order);
+  const navEntries = [...(data.navGroups ?? [])]
+    .filter((g) => g.showInNav)
+    .sort((a, b) => a.order - b.order)
+    .flatMap((group) => {
+      const member = orderedWidgets.find((w) => w.visible && w.groupId === group.id);
+      return member ? [{ id: group.id, name: group.name, key: member.key }] : [];
+    });
+
+  // The hero CTAs are deliberately NOT derived from nav sections — they keep pointing at
+  // whatever gallery/contact widget exists regardless of how (or whether) the user has set up
+  // their nav sections yet.
+  function firstVisibleKeyForSection(section: string): string | undefined {
+    return orderedWidgets.find((w) => w.visible && getWidget(w.key)?.manifest.section === section)?.key;
   }
-  const workKey = navEntries.get("gallery");
-  const contactKey = navEntries.get("contact");
+  const workKey = firstVisibleKeyForSection("gallery");
+  const contactKey = firstVisibleKeyForSection("contact");
 
   return (
     <div
@@ -200,11 +196,11 @@ export function AnimatedMotionComponent({ data, palette, slots }: ThemeProps) {
             {initialsFor(profile.name || "Portfolio")}
           </a>
           <div className="theme-nav-right">
-            {navEntries.size > 0 && (
+            {navEntries.length > 0 && (
               <div className="theme-nav-links">
-                {[...navEntries].map(([section, key]) => (
-                  <a key={section} href={`#portfolio-section-${key}`} className="theme-nav-link">
-                    {sectionLabel(section)}
+                {navEntries.map((entry) => (
+                  <a key={entry.id} href={`#portfolio-section-${entry.key}`} className="theme-nav-link">
+                    {entry.name}
                   </a>
                 ))}
               </div>

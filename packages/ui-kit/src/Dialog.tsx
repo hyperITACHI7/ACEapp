@@ -25,6 +25,8 @@ const overlayStyle: React.CSSProperties = {
   backdropFilter: "blur(4px)",
 };
 
+// Matches globals.css's `.glass-panel` recipe (translucent fill + blur + soft border + the one
+// shadow in the whole design system — modals/panels are the only place elevation shows at all).
 const contentStyle: React.CSSProperties = {
   position: "fixed",
   top: "50%",
@@ -36,10 +38,11 @@ const contentStyle: React.CSSProperties = {
   maxHeight: "85vh",
   overflowY: "auto",
   borderRadius: "1rem",
-  border: "1px solid rgba(255, 255, 255, 0.1)",
-  background: "#12121e",
+  border: "1px solid rgba(38, 38, 38, 0.5)",
+  background: "rgba(23, 23, 23, 0.8)",
+  backdropFilter: "blur(24px)",
   padding: "1.5rem",
-  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.6)",
+  boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.5)",
 };
 
 const closeStyle: React.CSSProperties = { position: "absolute", top: "1rem", right: "1rem" };

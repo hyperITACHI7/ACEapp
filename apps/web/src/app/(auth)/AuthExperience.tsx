@@ -58,8 +58,8 @@ function InputField({
 
   return (
     <div
-      className={`relative flex items-center rounded-xl border transition-all duration-300 ${
-        focused ? "border-purple-400/60 bg-white/8 shadow-[0_0_0_3px_rgba(168,85,247,0.15)]" : "border-white/10 bg-white/5"
+      className={`relative flex items-center rounded-lg border transition-all duration-300 ${
+        focused ? "border-white/40 bg-white/8 shadow-[0_0_0_3px_rgba(255,255,255,0.12)]" : "border-white/10 bg-white/5"
       }`}
     >
       <Icon className="absolute left-4 w-4 h-4 text-muted-foreground pointer-events-none" />
@@ -110,22 +110,19 @@ function Divider() {
   );
 }
 
+// One flat, solid white primary button — per the design system's rule that there's exactly one
+// bright, unmissable action per screen.
 function PrimaryButton({ children, loading }: { children: React.ReactNode; loading?: boolean }) {
   return (
     <button
       type="submit"
       disabled={loading}
-      className="relative w-full py-3.5 rounded-xl text-sm font-bold text-white overflow-hidden group active:scale-[0.98] transition-transform duration-150 disabled:opacity-70"
-      style={{ background: "linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #06b6d4 100%)", backgroundSize: "200% 200%" }}
+      className="relative w-full py-3.5 rounded-lg text-sm font-bold bg-primary text-primary-foreground overflow-hidden group active:scale-[0.98] transition-opacity duration-150 hover:opacity-90 disabled:opacity-70"
     >
-      <span
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ background: "linear-gradient(135deg, #9333ea 0%, #db2777 50%, #0891b2 100%)" }}
-      />
       <span className="relative flex items-center justify-center gap-2">
         {loading ? (
           <motion.div
-            className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+            className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full"
             animate={{ rotate: 360 }}
             transition={{ duration: 0.7, repeat: Infinity, ease: "linear" }}
           />
@@ -173,7 +170,7 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
   const cursorY = useMotionValue(0);
   const spotlightX = useSpring(cursorX, { stiffness: 150, damping: 25, mass: 0.3 });
   const spotlightY = useSpring(cursorY, { stiffness: 150, damping: 25, mass: 0.3 });
-  const spotlightBackground = useMotionTemplate`radial-gradient(500px circle at ${spotlightX}px ${spotlightY}px, rgba(168,85,247,0.16), transparent 80%)`;
+  const spotlightBackground = useMotionTemplate`radial-gradient(500px circle at ${spotlightX}px ${spotlightY}px, rgba(255,255,255,0.1), transparent 80%)`;
 
   const normX = useMotionValue(0);
   const normY = useMotionValue(0);
@@ -203,7 +200,10 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
     setSubmitted(false);
     setError(null);
     if (next === "login" || next === "signup") {
-      router.push(next === "login" ? "/login" : "/signup");
+      // Sync the address bar without a Next.js route transition — router.push here would
+      // unmount/remount this whole component (since /login and /signup are separate pages),
+      // resetting all animation state and reading as a jarring "page refresh" mid-tab-switch.
+      window.history.pushState(null, "", next === "login" ? "/login" : "/signup");
     }
   };
 
@@ -283,7 +283,7 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
         >
           <motion.div
             className="w-[650px] h-[650px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(ellipse at center, rgba(168,85,247,0.35) 0%, transparent 70%)" }}
+            style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, transparent 70%)" }}
             animate={{ x: [0, 40, -20, 0], y: [0, -30, 25, 0], scale: [1, 1.1, 0.95, 1] }}
             transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
           />
@@ -294,7 +294,7 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
         >
           <motion.div
             className="w-[550px] h-[550px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(ellipse at center, rgba(6,182,212,0.28) 0%, transparent 70%)" }}
+            style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.06) 0%, transparent 70%)" }}
             animate={{ x: [0, -35, 20, 0], y: [0, 25, -20, 0], scale: [1, 0.92, 1.08, 1] }}
             transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 2 }}
           />
@@ -305,7 +305,7 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
         >
           <motion.div
             className="w-[400px] h-[400px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(ellipse at center, rgba(236,72,153,0.22) 0%, transparent 70%)" }}
+            style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.05) 0%, transparent 70%)" }}
             animate={{ x: [0, 25, -15, 0], y: [0, -20, 30, 0], scale: [1, 1.06, 0.97, 1] }}
             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 4 }}
           />
@@ -316,7 +316,7 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
         >
           <motion.div
             className="w-[300px] h-[300px] rounded-full blur-3xl"
-            style={{ background: "radial-gradient(ellipse at center, rgba(251,146,60,0.18) 0%, transparent 70%)" }}
+            style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.05) 0%, transparent 70%)" }}
             animate={{ x: [0, -20, 15, 0], y: [0, 20, -25, 0], scale: [1, 1.05, 0.95, 1] }}
             transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 1 }}
           />
@@ -339,10 +339,10 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-purple-400/30 bg-purple-500/10 text-purple-300 text-xs font-medium mb-6 tracking-wide"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/15 bg-white/5 text-foreground text-xs font-medium mb-6 tracking-wide"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              Portfolio Builder
+              ACEapp
             </motion.div>
             <motion.h1
               initial={{ opacity: 0, y: 24 }}
@@ -350,16 +350,13 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
               transition={{ duration: 0.7, delay: 0.1 }}
               className="text-5xl xl:text-6xl font-extrabold leading-[1.1] tracking-tight"
             >
-              Build a portfolio{" "}
-              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                that gets you hired.
-              </span>
+              Build a portfolio <span className="text-foreground">that gets you hired.</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="mt-5 text-base leading-relaxed font-body font-light text-[#9090b0]"
+              className="mt-5 text-base leading-relaxed font-body font-light text-muted-foreground"
             >
               Design a stunning, professional portfolio in minutes. No code required — just your work and your story.
             </motion.p>
@@ -377,7 +374,7 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
-                className="flex items-center gap-3 text-sm font-body text-[#b0b0d0]"
+                className="flex items-center gap-3 text-sm font-body text-muted-foreground"
               >
                 <span className="text-xl">{f.emoji}</span>
                 {f.text}
@@ -391,15 +388,17 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
             transition={{ duration: 0.8, delay: 0.6 }}
             className="rounded-2xl border border-white/8 overflow-hidden bg-white/[0.03]"
           >
-            <div className="h-1.5 w-full" style={{ background: "linear-gradient(90deg, #a855f7, #ec4899, #06b6d4)" }} />
+            <div className="h-1.5 w-full bg-white/15" />
             <div className="p-4 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full flex-shrink-0" style={{ background: "linear-gradient(135deg, #a855f7, #06b6d4)" }} />
+              <div className="w-9 h-9 rounded-full flex-shrink-0 bg-white/10 flex items-center justify-center text-xs font-semibold">
+                JL
+              </div>
               <div>
                 <p className="text-sm font-semibold">Jordan Lee</p>
-                <p className="text-xs text-[#7878a0]">Full-Stack Developer — sample portfolio</p>
+                <p className="text-xs text-muted-foreground">Full-Stack Developer — sample portfolio</p>
               </div>
               <div className="ml-auto">
-                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-cyan-500/15 text-cyan-400">Live</span>
+                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-success/15 text-success">Live</span>
               </div>
             </div>
             <div className="px-4 pb-4 grid grid-cols-3 gap-2">
@@ -423,11 +422,11 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
           <div
             className="rounded-2xl p-8 border"
             style={{
-              background: "rgba(14, 14, 24, 0.8)",
+              background: "rgba(23, 23, 23, 0.8)",
               backdropFilter: "blur(32px)",
               WebkitBackdropFilter: "blur(32px)",
-              borderColor: "rgba(168,85,247,0.15)",
-              boxShadow: "0 0 0 1px rgba(255,255,255,0.04) inset, 0 40px 80px rgba(0,0,0,0.6)",
+              borderColor: "rgba(38, 38, 38, 0.5)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0px 10px 30px rgba(0,0,0,0.5)",
             }}
           >
             <div className="flex gap-1 mb-8 p-1 rounded-xl bg-white/[0.04]">
@@ -436,15 +435,15 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
                   key={v}
                   onClick={() => navigate(v)}
                   className="relative flex-1 py-2 text-sm font-semibold rounded-lg transition-colors duration-200"
-                  style={{ color: view === v ? "#f0f0ff" : "#7878a0" }}
+                  style={{ color: view === v ? "#ffffff" : "#c4c7c8" }}
                 >
                   {view === v && (
                     <motion.div
                       layoutId="tab-indicator"
                       className="absolute inset-0 rounded-lg"
                       style={{
-                        background: "linear-gradient(135deg, rgba(168,85,247,0.4), rgba(6,182,212,0.2))",
-                        border: "1px solid rgba(168,85,247,0.3)",
+                        background: "rgba(255,255,255,0.1)",
+                        border: "1px solid rgba(255,255,255,0.15)",
                       }}
                       transition={{ type: "spring", stiffness: 500, damping: 40 }}
                     />
@@ -454,31 +453,34 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
               ))}
             </div>
 
-            <div className="overflow-hidden">
+            {/* Fixed to the tallest view's (signup's) natural height so switching tabs
+               never resizes the card — measured empirically; min-height only sets a floor,
+               so a validation error can still push a view taller without clipping. */}
+            <div className="overflow-hidden" style={{ minHeight: 462 }}>
               <AnimatePresence mode="wait" custom={direction}>
                 {view === "forgot" ? (
                   <motion.div key="forgot" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3, ease: "easeOut" }}>
                     {submitted ? (
                       <div className="flex flex-col items-center gap-4 py-6 text-center">
                         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
-                          <CheckCircle2 className="w-14 h-14 text-cyan-400" />
+                          <CheckCircle2 className="w-14 h-14 text-success" />
                         </motion.div>
                         <h2 className="text-xl font-bold">Check your inbox</h2>
-                        <p className="text-sm font-body text-[#7878a0]">
+                        <p className="text-sm font-body text-muted-foreground">
                           If an account exists for <span className="text-foreground font-medium">{resetEmail || "that email"}</span>, a reset link is on its way.
                         </p>
-                        <button onClick={() => navigate("login")} className="mt-2 text-sm font-medium flex items-center gap-1.5 text-purple-400">
+                        <button onClick={() => navigate("login")} className="mt-2 text-sm font-medium flex items-center gap-1.5 text-foreground">
                           <ArrowLeft className="w-3.5 h-3.5" /> Back to Sign In
                         </button>
                       </div>
                     ) : (
                       <form onSubmit={handleForgotSubmit} className="flex flex-col gap-5">
                         <div>
-                          <button type="button" onClick={() => navigate("login")} className="flex items-center gap-1.5 text-xs mb-5 text-[#7878a0] transition-colors">
+                          <button type="button" onClick={() => navigate("login")} className="flex items-center gap-1.5 text-xs mb-5 text-muted-foreground transition-colors">
                             <ArrowLeft className="w-3.5 h-3.5" /> Back to Sign In
                           </button>
                           <h2 className="text-xl font-bold mb-1">Reset your password</h2>
-                          <p className="text-sm font-body text-[#7878a0]">Enter your email and we&apos;ll send you a link.</p>
+                          <p className="text-sm font-body text-muted-foreground">Enter your email and we&apos;ll send you a link.</p>
                         </div>
                         <InputField type="email" placeholder="your@email.com" icon={Mail} value={resetEmail} onChange={setResetEmail} required />
                         <PrimaryButton loading={loading}>Send Reset Link</PrimaryButton>
@@ -496,15 +498,15 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
                       <InputField type="email" placeholder="Email address" icon={Mail} value={email} onChange={setEmail} required />
                       <InputField type="password" placeholder="Password" icon={Lock} value={password} onChange={setPassword} showToggle required />
                       <div className="flex justify-end">
-                        <button type="button" onClick={() => navigate("forgot")} className="text-xs font-medium transition-colors hover:text-purple-300 text-[#7878a0]">
+                        <button type="button" onClick={() => navigate("forgot")} className="text-xs font-medium transition-colors hover:text-foreground text-muted-foreground">
                           Forgot password?
                         </button>
                       </div>
-                      {error && <p className="text-xs text-red-400">{error}</p>}
+                      {error && <p className="text-xs text-destructive">{error}</p>}
                       <PrimaryButton loading={loading}>Sign In</PrimaryButton>
-                      <p className="text-center text-xs font-body text-[#7878a0]">
+                      <p className="text-center text-xs font-body text-muted-foreground">
                         Don&apos;t have an account?{" "}
-                        <button type="button" onClick={() => navigate("signup")} className="font-medium hover:text-purple-300 transition-colors text-purple-400">
+                        <button type="button" onClick={() => navigate("signup")} className="font-medium hover:opacity-80 transition-opacity text-foreground">
                           Sign Up
                         </button>
                       </p>
@@ -518,7 +520,7 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
                           🎉
                         </motion.div>
                         <h2 className="text-xl font-bold">Welcome aboard!</h2>
-                        <p className="text-sm font-body text-[#7878a0]">Your portfolio journey starts now.</p>
+                        <p className="text-sm font-body text-muted-foreground">Your portfolio journey starts now.</p>
                       </div>
                     ) : (
                       <form onSubmit={handleSignup} className="flex flex-col gap-4">
@@ -537,15 +539,15 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
                         />
                         <InputField type="email" placeholder="Email address" icon={Mail} value={email} onChange={setEmail} required />
                         <InputField type="password" placeholder="Create password" icon={Lock} value={password} onChange={setPassword} showToggle required minLength={8} />
-                        <p className="text-xs font-body text-[#7878a0]">
-                          By creating an account you agree to our <span className="underline cursor-pointer text-purple-400">Terms</span> and{" "}
-                          <span className="underline cursor-pointer text-purple-400">Privacy Policy</span>.
+                        <p className="text-xs font-body text-muted-foreground">
+                          By creating an account you agree to our <span className="underline cursor-pointer text-foreground">Terms</span> and{" "}
+                          <span className="underline cursor-pointer text-foreground">Privacy Policy</span>.
                         </p>
-                        {error && <p className="text-xs text-red-400">{error}</p>}
+                        {error && <p className="text-xs text-destructive">{error}</p>}
                         <PrimaryButton loading={loading}>Create Account</PrimaryButton>
-                        <p className="text-center text-xs font-body text-[#7878a0]">
+                        <p className="text-center text-xs font-body text-muted-foreground">
                           Already have an account?{" "}
-                          <button type="button" onClick={() => navigate("login")} className="font-medium hover:text-purple-300 transition-colors text-purple-400">
+                          <button type="button" onClick={() => navigate("login")} className="font-medium hover:opacity-80 transition-opacity text-foreground">
                             Sign In
                           </button>
                         </p>
@@ -559,7 +561,7 @@ export function AuthExperience({ initialView }: { initialView: "login" | "signup
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.8 }} className="flex items-center justify-center gap-5 mt-5">
             {["🔒 SSL Secured", "✦ No spam", "⚡ Free forever"].map((t) => (
-              <span key={t} className="text-xs text-[#4a4a6a]">
+              <span key={t} className="text-xs text-muted-foreground/60">
                 {t}
               </span>
             ))}

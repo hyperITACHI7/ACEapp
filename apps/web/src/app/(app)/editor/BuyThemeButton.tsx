@@ -65,7 +65,7 @@ export function BuyThemeButton({ themeId, priceInPaise, onPurchased }: BuyThemeB
         amount: body.amount,
         currency: body.currency,
         order_id: body.orderId,
-        name: "Portfolio Builder",
+        name: "ACEapp",
         description: `Theme purchase`,
         handler: async () => {
           showToast("Payment received — finalizing…", "info");

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ProfileSchema } from "./profile";
-import { WidgetInstanceSchema } from "./widget";
+import { WidgetInstanceSchema, NavGroupSchema } from "./widget";
 import { ProjectSchema } from "./project";
 import { ExperienceSchema } from "./experience";
 import { GithubIntegrationSchema } from "./github";
@@ -18,6 +18,11 @@ export const PortfolioDataSchema = z.object({
   themeId: z.string(),
   palette: z.string(),
   widgets: z.array(WidgetInstanceSchema).default([]),
+  // Absent (not `[]` via `.default()`) is deliberately meaningful, same convention as
+  // `WidgetInstance.grid` — it distinguishes "never initialized, seed sensible defaults from
+  // current widgets" from "user intentionally has zero nav sections" (see
+  // `seedDefaultNavGroups` in the editor's sectionOps.ts).
+  navGroups: z.array(NavGroupSchema).optional(),
   projects: z.array(ProjectSchema).default([]),
   experience: z.array(ExperienceSchema).default([]),
   skills: z.array(z.string()).default([]),

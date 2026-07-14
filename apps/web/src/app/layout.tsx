@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Plus_Jakarta_Sans, Inter } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter, Limelight, Roboto } from "next/font/google";
 import { Toaster } from "@portfolio/ui-kit";
 import "./globals.css";
 
@@ -15,8 +15,24 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+// "ACE" in the sidebar wordmark — a decorative display font, distinct on purpose from the app's
+// own Plus Jakarta/Inter type system.
+const limelight = Limelight({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-limelight",
+});
+
+// The "." in the "ACE.app" wordmark — deliberately a third, plain font distinct from both
+// Limelight (ACE) and Doto (app).
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: "700",
+  variable: "--font-roboto",
+});
+
 export const metadata = {
-  title: "Portfolio Builder",
+  title: "ACEapp",
   description: "Build and publish a professional portfolio in minutes.",
 };
 
@@ -41,13 +57,22 @@ const THEME_FONTS_HREF =
   ].join("&") +
   "&display=swap";
 
+// "app" in the sidebar wordmark — not in next/font/google's bundled font list for this Next.js
+// version, so loaded as a real stylesheet like the per-theme fonts above rather than via
+// next/font.
+const DOTO_HREF = "https://fonts.googleapis.com/css2?family=Doto:wght@400..900&display=swap";
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${plusJakarta.variable} ${inter.variable}`}>
+    <html
+      lang="en"
+      className={`${plusJakarta.variable} ${inter.variable} ${limelight.variable} ${roboto.variable}`}
+    >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href={THEME_FONTS_HREF} rel="stylesheet" />
+        <link href={DOTO_HREF} rel="stylesheet" />
       </head>
       <body>
         {children}

@@ -19,10 +19,25 @@ export const WidgetInstanceSchema = z.object({
   visible: z.boolean().default(true),
   config: z.record(z.any()).default({}),
   grid: GridPlacementSchema.optional(),
+  // Absent = ungrouped, same "absence is meaningful" convention as `grid` above — a widget with
+  // no groupId never appears in a theme's nav header and sorts last (see `resolveGridLayout`).
+  groupId: z.string().optional(),
 });
 
 export type GridPlacement = z.infer<typeof GridPlacementSchema>;
 export type WidgetInstance = z.infer<typeof WidgetInstanceSchema>;
+
+// A user-named, user-orderable grouping of widgets — purely organizational (Outline sidebar
+// clustering) and nav-label-driving (a theme's header shows one link per group with
+// `showInNav`), never a distinct widget-content type of its own.
+export const NavGroupSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  order: z.number().int(),
+  showInNav: z.boolean().default(true),
+});
+
+export type NavGroup = z.infer<typeof NavGroupSchema>;
 
 export interface ResolvedGridItem {
   key: string;
@@ -45,12 +60,27 @@ export interface ResolvedGridItem {
  * `@portfolio/widgets` without an import cycle) forces a widget back to full-width even if a
  * narrower placement was previously stored — a widget locked *after* the user resized it snaps
  * back rather than staying stuck narrow.
+ *
+ * `navGroups` makes this group-aware: widgets are sorted primarily by their group's `order`
+ * (ungrouped, or a dangling reference to a deleted group, always sorts last via `Infinity`) and
+ * only secondarily by their own `order`. This is what makes a group's members land in
+ * contiguous rows without a second coordinate system — both the Outline sidebar (which slices
+ * this same result into per-group buckets) and the public renderer call this one function.
  */
 export function resolveGridLayout(
   widgets: WidgetInstance[],
+  navGroups: NavGroup[] = [],
   isLockedWidth?: (key: string) => boolean
 ): ResolvedGridItem[] {
-  const sorted = [...widgets].sort((a, b) => a.order - b.order);
+  const groupOrder = (groupId: string | undefined): number => {
+    if (!groupId) return Infinity;
+    return navGroups.find((g) => g.id === groupId)?.order ?? Infinity;
+  };
+
+  const sorted = [...widgets].sort((a, b) => {
+    const groupDelta = groupOrder(a.groupId) - groupOrder(b.groupId);
+    return groupDelta !== 0 ? groupDelta : a.order - b.order;
+  });
   const occupied = new Set<string>();
 
   const isFree = (x: number, y: number, w: number, h: number) => {

@@ -1,6 +1,8 @@
 export { ErrorBoundary } from "./ErrorBoundary";
 export { Button, type ButtonProps } from "./Button";
 export { Card } from "./Card";
+export { Chip, type ChipProps } from "./Chip";
+export { HealthScoreRing, type HealthScoreRingProps } from "./HealthScoreRing";
 export { Toaster, useToast } from "./Toast";
 export { cn } from "./utils";
 export { EditorModeContext, useEditorMode, type EditorMode } from "./EditorModeContext";

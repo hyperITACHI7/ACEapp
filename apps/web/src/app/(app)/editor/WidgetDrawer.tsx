@@ -52,7 +52,7 @@ export function WidgetDrawer({ widgets, onSelect }: WidgetDrawerProps) {
               onChange={(e) => {
                 if (e.target.value !== PLACEHOLDER) onSelect(section, e.target.value);
               }}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-foreground outline-none focus:border-purple-400/60 transition-colors"
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-foreground outline-none focus:border-white/40 transition-colors"
             >
               {!current && (
                 <option value={PLACEHOLDER} disabled>

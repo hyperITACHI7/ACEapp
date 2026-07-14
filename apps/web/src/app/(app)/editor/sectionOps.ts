@@ -1,5 +1,6 @@
-import type { PortfolioData, WidgetInstance } from "@portfolio/schema";
+import type { NavGroup, PortfolioData, WidgetInstance } from "@portfolio/schema";
 import { getWidget } from "@portfolio/widgets";
+import { sectionLabel } from "./sectionMeta";
 
 function widgetSection(key: string): string | undefined {
   return getWidget(key)?.manifest.section;
@@ -72,4 +73,102 @@ export function updateGridPositions(prev: PortfolioData, positions: GridPosition
       };
     }),
   };
+}
+
+/** Creates a new, empty, immediately-renameable nav section appended to the end. Name is
+ *  de-duped against existing section names ("New Section", "New Section 2", ...). */
+export function createNavGroup(prev: PortfolioData): PortfolioData {
+  const groups = prev.navGroups ?? [];
+  const existingNames = new Set(groups.map((g) => g.name));
+  let name = "New Section";
+  let n = 2;
+  while (existingNames.has(name)) {
+    name = `New Section ${n}`;
+    n++;
+  }
+  const group: NavGroup = { id: crypto.randomUUID(), name, order: groups.length, showInNav: true };
+  return { ...prev, navGroups: [...groups, group] };
+}
+
+export function renameNavGroup(prev: PortfolioData, groupId: string, name: string): PortfolioData {
+  const groups = prev.navGroups ?? [];
+  return { ...prev, navGroups: groups.map((g) => (g.id === groupId ? { ...g, name } : g)) };
+}
+
+/** Flips whether a section's link shows in a theme's nav header — purely a nav-level switch,
+ *  independent of whether its widgets are visible/positioned in the sidebar or portfolio. */
+export function toggleNavGroupVisible(prev: PortfolioData, groupId: string): PortfolioData {
+  const groups = prev.navGroups ?? [];
+  return { ...prev, navGroups: groups.map((g) => (g.id === groupId ? { ...g, showInNav: !g.showInNav } : g)) };
+}
+
+/** Swaps a section's order with its immediate up/down neighbor — simple reordering (not
+ *  drag-and-drop), since a portfolio typically only has a handful of nav sections. */
+export function reorderNavGroup(prev: PortfolioData, groupId: string, direction: "up" | "down"): PortfolioData {
+  const groups = [...(prev.navGroups ?? [])].sort((a, b) => a.order - b.order);
+  const index = groups.findIndex((g) => g.id === groupId);
+  const swapWith = direction === "up" ? index - 1 : index + 1;
+  if (index === -1 || swapWith < 0 || swapWith >= groups.length) return prev;
+  const a = groups[index]!;
+  const b = groups[swapWith]!;
+  const navGroups = groups.map((g) => {
+    if (g.id === a.id) return { ...g, order: b.order };
+    if (g.id === b.id) return { ...g, order: a.order };
+    return g;
+  });
+  return { ...prev, navGroups };
+}
+
+/** Removes a section — its widgets fall back to "Ungrouped" (never deleted), and remaining
+ *  sections' `order` is re-sequenced. */
+export function deleteNavGroup(prev: PortfolioData, groupId: string): PortfolioData {
+  const remaining = (prev.navGroups ?? []).filter((g) => g.id !== groupId);
+  const navGroups = [...remaining].sort((a, b) => a.order - b.order).map((g, i) => ({ ...g, order: i }));
+  return {
+    ...prev,
+    navGroups,
+    widgets: prev.widgets.map((w) => (w.groupId === groupId ? { ...w, groupId: undefined } : w)),
+  };
+}
+
+/** Moves a widget into a different section (or ungroups it, when `groupId` is `undefined`).
+ *  Clears the widget's stored `grid` so it re-auto-places inside its new section's contiguous
+ *  block on the next render instead of keeping a stale position from its old context. */
+export function assignWidgetGroup(prev: PortfolioData, widgetKey: string, groupId: string | undefined): PortfolioData {
+  return {
+    ...prev,
+    widgets: prev.widgets.map((w) => (w.key === widgetKey ? { ...w, groupId, grid: undefined } : w)),
+  };
+}
+
+/** Runs once, only when `navGroups` has never been initialized (`undefined` — not an empty
+ *  array the user intentionally cleared down to zero): auto-creates one nav section per
+ *  distinct content section among the current widgets, named via the same `sectionLabel` the
+ *  sidebar/drawer already use, and assigns each matching widget into it. Without this, an
+ *  existing portfolio would silently lose all its header links the moment this feature ships —
+ *  instead the user sees their current auto-derived sections pre-populated and can
+ *  rename/reorder/hide/regroup from there. */
+export function seedDefaultNavGroups(prev: PortfolioData): PortfolioData {
+  if (prev.navGroups !== undefined) return prev;
+
+  const ordered = [...prev.widgets].sort((a, b) => a.order - b.order);
+  const sections: string[] = [];
+  for (const w of ordered) {
+    const section = widgetSection(w.key);
+    if (section && !sections.includes(section)) sections.push(section);
+  }
+  if (sections.length === 0) return { ...prev, navGroups: [] };
+
+  const idBySection = new Map(sections.map((section) => [section, crypto.randomUUID()]));
+  const navGroups: NavGroup[] = sections.map((section, i) => ({
+    id: idBySection.get(section)!,
+    name: sectionLabel(section),
+    order: i,
+    showInNav: true,
+  }));
+  const widgets = prev.widgets.map((w) => {
+    const groupId = idBySection.get(widgetSection(w.key) ?? "");
+    return groupId ? { ...w, groupId } : w;
+  });
+  return { ...prev, navGroups, widgets };
 }

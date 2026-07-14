@@ -14,6 +14,8 @@ import { TopBar } from "./TopBar";
 import { SettingsModal } from "./SettingsModal";
 import { useWidgetActions } from "./useWidgetActions";
 import { useThemeAndMediaActions } from "./useThemeAndMediaActions";
+import { useNavGroupActions } from "./useNavGroupActions";
+import { seedDefaultNavGroups } from "./sectionOps";
 
 // react-grid-layout measures a real DOM width on mount and has no meaningful server-rendered
 // output for an editor-only panel, so it's loaded client-side only.
@@ -48,7 +50,7 @@ function normalizeWidgetsForTheme(data: PortfolioData): PortfolioData {
 export function EditorClient({ portfolioId, initialData, initialVersion, published }: EditorClientProps) {
   const { draft, saving, updateDraft } = useOptimisticDraft(
     portfolioId,
-    normalizeWidgetsForTheme(initialData),
+    seedDefaultNavGroups(normalizeWidgetsForTheme(initialData)),
     initialVersion
   );
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -63,6 +65,15 @@ export function EditorClient({ portfolioId, initialData, initialVersion, publish
 
   const { handleSectionSelect, handleToggleVisible, handleLayoutChange, handleRemoveWidget } =
     useWidgetActions(updateDraft);
+
+  const {
+    handleCreateGroup,
+    handleRenameGroup,
+    handleToggleGroupVisible,
+    handleReorderGroup,
+    handleDeleteGroup,
+    handleAssignGroup,
+  } = useNavGroupActions(updateDraft);
 
   const {
     uploadingPhoto,
@@ -111,10 +122,17 @@ export function EditorClient({ portfolioId, initialData, initialVersion, publish
           {!outlineCollapsed && (
             <OutlineSidebar
               widgets={draft.widgets}
+              navGroups={draft.navGroups ?? []}
               onToggleVisible={handleToggleVisible}
               onLayoutChange={handleLayoutChange}
               onRemoveWidget={handleRemoveWidget}
               onDraggingChange={setOutlineDragging}
+              onCreateGroup={handleCreateGroup}
+              onRenameGroup={handleRenameGroup}
+              onToggleGroupVisible={handleToggleGroupVisible}
+              onReorderGroup={handleReorderGroup}
+              onDeleteGroup={handleDeleteGroup}
+              onAssignGroup={handleAssignGroup}
             />
           )}
         </div>

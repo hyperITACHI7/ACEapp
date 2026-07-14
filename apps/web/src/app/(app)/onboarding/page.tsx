@@ -10,7 +10,7 @@ type Step = "role" | "domain" | "goal" | "resume" | "theme" | "review";
 const STEPS: Step[] = ["role", "domain", "goal", "resume", "theme", "review"];
 
 const fieldClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-purple-400/60 focus:bg-white/8 focus:shadow-[0_0_0_3px_rgba(168,85,247,0.15)] transition-all";
+  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-white/40 focus:bg-white/8 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.12)] transition-all";
 const labelClass = "block text-sm font-medium text-muted-foreground mb-1.5";
 
 export default function OnboardingPage() {
@@ -132,12 +132,17 @@ export default function OnboardingPage() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <p className="text-xs text-muted-foreground mb-4 tracking-wide">
+      <p className="text-xs text-muted-foreground mb-2 tracking-wide">
         Step {stepIndex + 1} of {STEPS.length}
       </p>
+      <div className="flex items-center gap-2 mb-4" aria-hidden="true">
+        {STEPS.map((s, i) => (
+          <div key={s} className={`h-1.5 flex-1 rounded-full ${i <= stepIndex ? "bg-white" : "bg-white/10"}`} />
+        ))}
+      </div>
 
       {step === "role" && (
-        <Card className="flex flex-col gap-4">
+        <Card className="flex flex-col gap-4 bg-panel backdrop-blur-none">
           <h2 className="text-xl font-bold">What best describes you?</h2>
           <select
             className={fieldClass}
@@ -159,7 +164,7 @@ export default function OnboardingPage() {
       )}
 
       {step === "domain" && (
-        <Card className="flex flex-col gap-4">
+        <Card className="flex flex-col gap-4 bg-panel backdrop-blur-none">
           <h2 className="text-xl font-bold">What field are you in?</h2>
           <input
             className={fieldClass}
@@ -180,7 +185,7 @@ export default function OnboardingPage() {
       )}
 
       {step === "goal" && (
-        <Card className="flex flex-col gap-4">
+        <Card className="flex flex-col gap-4 bg-panel backdrop-blur-none">
           <h2 className="text-xl font-bold">What&apos;s your main goal?</h2>
           <select
             className={fieldClass}
@@ -205,7 +210,7 @@ export default function OnboardingPage() {
       )}
 
       {step === "resume" && (
-        <Card className="flex flex-col gap-4">
+        <Card className="flex flex-col gap-4 bg-panel backdrop-blur-none">
           <div>
             <h2 className="text-xl font-bold">Upload your resume (optional)</h2>
             <p className="text-sm font-body text-muted-foreground mt-1">
@@ -222,7 +227,7 @@ export default function OnboardingPage() {
               if (file) onResumeUpload(file);
             }}
           />
-          {resumeError && <p className="text-xs text-red-400">{resumeError}</p>}
+          {resumeError && <p className="text-xs text-destructive">{resumeError}</p>}
           {name && (
             <div>
               <label className={labelClass}>Name</label>
@@ -251,7 +256,7 @@ export default function OnboardingPage() {
       )}
 
       {step === "theme" && (
-        <Card className="flex flex-col gap-4">
+        <Card className="flex flex-col gap-4 bg-panel backdrop-blur-none">
           <div>
             <h2 className="text-xl font-bold">Pick a theme</h2>
             <p className="text-sm font-body text-muted-foreground mt-1">
@@ -262,9 +267,9 @@ export default function OnboardingPage() {
             {allThemes.map((t) => (
               <label
                 key={t.manifest.id}
-                className={`rounded-xl p-3 cursor-pointer border transition-colors ${
+                className={`rounded-lg p-3 cursor-pointer border transition-colors ${
                   selectedThemeId === t.manifest.id
-                    ? "border-purple-400/60 bg-purple-500/10"
+                    ? "border-white/40 bg-white/10"
                     : "border-white/10 bg-white/5 hover:border-white/20"
                 }`}
               >
@@ -273,7 +278,7 @@ export default function OnboardingPage() {
                   name="theme"
                   checked={selectedThemeId === t.manifest.id}
                   onChange={() => setThemeId(t.manifest.id)}
-                  className="mr-2 accent-purple-500"
+                  className="mr-2 accent-white"
                 />
                 {t.manifest.name}
                 {t.manifest.isPremium && (
@@ -292,7 +297,7 @@ export default function OnboardingPage() {
       )}
 
       {step === "review" && (
-        <Card className="flex flex-col gap-4">
+        <Card className="flex flex-col gap-4 bg-panel backdrop-blur-none">
           <h2 className="text-xl font-bold">Ready to go</h2>
           {alreadyPublished && !confirmedReset ? (
             <div className="flex flex-col gap-3">

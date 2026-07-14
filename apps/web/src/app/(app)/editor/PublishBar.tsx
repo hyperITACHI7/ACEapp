@@ -43,7 +43,7 @@ export function PublishBar({ portfolioId, draft, published, saving }: PublishBar
         <strong className="text-sm shrink-0">Portfolio health: {score}%</strong>
         <div className="h-1.5 flex-1 max-w-40 rounded-full bg-white/10 overflow-hidden">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 transition-all"
+            className="h-full rounded-full bg-foreground transition-all"
             style={{ width: `${score}%` }}
           />
         </div>

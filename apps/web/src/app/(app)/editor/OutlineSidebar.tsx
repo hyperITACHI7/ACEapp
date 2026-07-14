@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type MutableRefObject, type RefObject } from "react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { resolveGridLayout, type WidgetInstance } from "@portfolio/schema";
+import { ChevronDown, ChevronUp, Eye, EyeOff, X } from "lucide-react";
+import { resolveGridLayout, type NavGroup, type ResolvedGridItem, type WidgetInstance } from "@portfolio/schema";
 import { listWidgets } from "@portfolio/widgets";
 import { sectionIcon, sectionColor, sectionLabel } from "./sectionMeta";
 import type { GridPositionUpdate } from "./sectionOps";
@@ -14,8 +15,13 @@ const ResizableGridLayout = GridLayout.WidthProvider(GridLayout);
 // Not exported by @types/react-grid-layout despite being part of its public prop surface.
 type ResizeHandle = "s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne";
 
+const UNGROUPED_ID = "__ungrouped__";
+
+type WidgetDef = ReturnType<typeof listWidgets>[number];
+
 interface OutlineSidebarProps {
   widgets: WidgetInstance[];
+  navGroups: NavGroup[];
   onToggleVisible: (key: string) => void;
   onLayoutChange: (positions: GridPositionUpdate[]) => void;
   onRemoveWidget: (key: string) => void;
@@ -23,6 +29,12 @@ interface OutlineSidebarProps {
    *  so a card dragged out of this sidebar's bounds is actually visible outside it rather than
    *  clipped by an ancestor's `overflow-y-auto`. */
   onDraggingChange?: (dragging: boolean) => void;
+  onCreateGroup: () => void;
+  onRenameGroup: (groupId: string, name: string) => void;
+  onToggleGroupVisible: (groupId: string) => void;
+  onReorderGroup: (groupId: string, direction: "up" | "down") => void;
+  onDeleteGroup: (groupId: string) => void;
+  onAssignGroup: (widgetKey: string, groupId: string | undefined) => void;
 }
 
 interface RGLLayoutItem {
@@ -38,48 +50,263 @@ interface RGLLayoutItem {
   resizeHandles?: ResizeHandle[];
 }
 
+interface Bucket {
+  id: string;
+  group: NavGroup | null;
+  placements: ResolvedGridItem[];
+}
+
+/** Finds the (other) section whose wrapper bounds currently contain a point — the mechanism
+ *  behind dragging a card from one section's grid into a different one, since react-grid-layout
+ *  has no native concept of dragging an item between separate grid instances. */
+function findHoveredOtherSection(
+  clientX: number,
+  clientY: number,
+  sectionRefs: Map<string, HTMLDivElement>,
+  ownId: string
+): string | null {
+  for (const [id, el] of sectionRefs) {
+    if (id === ownId) continue;
+    const r = el.getBoundingClientRect();
+    if (clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom) return id;
+  }
+  return null;
+}
+
 /**
- * The portfolio's whole layout, edited directly: every section is a card sized 1x1/1x2/2x1/2x2
- * by dragging its edge, and repositioned by dragging the card itself — the same continuous 2
- * column grid the real portfolio renders (see resolveGridLayout / portfolioRenderer.tsx), just
- * shown here as plain icon+label cards instead of live widget content. A card's visibility
- * toggles by clicking it directly (no separate checkbox) — detected as a "drag" that ended
- * exactly where it started, rather than a raw DOM click, since a resizable/draggable element's
- * click handler can be unreliable once a drag library is attached to it.
+ * The portfolio's whole layout, edited directly: widgets are grouped into user-named "sections"
+ * (real visual groups, each its own mini-grid — not just tags), each sized 1x1/1x2/2x1/2x2 by
+ * dragging its edge, and repositioned by dragging the card itself within its section — or moved
+ * to a *different* section by dragging it over that section's block. Sections are what a theme's
+ * nav header is built from (see AnimatedMotionComponent) — a widget with no section never
+ * appears in the header, and a section can be hidden from the header independently of its
+ * widgets' own visibility.
+ *
+ * All of a section's members are made contiguous in the *shared* grid coordinate space by
+ * `resolveGridLayout` itself (sorted primarily by group order, see @portfolio/schema/widget.ts) —
+ * this component just slices that one resolved array into per-group buckets and renders each as
+ * its own react-grid-layout instance, rebasing that bucket's rows to a local 0-based origin (RGL
+ * needs its own origin per instance) and un-rebasing back to the global row before persisting.
  */
 export function OutlineSidebar({
   widgets,
+  navGroups,
   onToggleVisible,
   onLayoutChange,
   onRemoveWidget,
   onDraggingChange,
+  onCreateGroup,
+  onRenameGroup,
+  onToggleGroupVisible,
+  onReorderGroup,
+  onDeleteGroup,
+  onAssignGroup,
 }: OutlineSidebarProps) {
   const allWidgetDefs = listWidgets();
   const isLockedWidth = (key: string) =>
     allWidgetDefs.find((w) => w.manifest.key === key)?.manifest.lockedWidth === true;
-  const placements = resolveGridLayout(widgets, isLockedWidth);
-  const dragStart = useRef<{ i: string; x: number; y: number } | null>(null);
+  const orderedGroups = [...navGroups].sort((a, b) => a.order - b.order);
+  const placements = resolveGridLayout(widgets, orderedGroups, isLockedWidth);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const sectionRefs = useRef(new Map<string, HTMLDivElement>());
+  const [dragOverSectionId, setDragOverSectionId] = useState<string | null>(null);
+  const [draggingActive, setDraggingActive] = useState(false);
+
+  const handleDraggingChange = useCallback(
+    (dragging: boolean) => {
+      setDraggingActive(dragging);
+      onDraggingChange?.(dragging);
+    },
+    [onDraggingChange]
+  );
+
+  const handleDropOnSection = useCallback(
+    (widgetKey: string, targetSectionId: string) => {
+      setDragOverSectionId(null);
+      onAssignGroup(widgetKey, targetSectionId === UNGROUPED_ID ? undefined : targetSectionId);
+    },
+    [onAssignGroup]
+  );
+
+  const validGroupIds = new Set(orderedGroups.map((g) => g.id));
+  const groupIdFor = (key: string): string | undefined => {
+    const gid = widgets.find((w) => w.key === key)?.groupId;
+    return gid && validGroupIds.has(gid) ? gid : undefined;
+  };
+
+  const buckets: Bucket[] = [
+    ...orderedGroups.map((group) => ({
+      id: group.id,
+      group,
+      placements: placements.filter((p) => groupIdFor(p.key) === group.id),
+    })),
+    {
+      id: UNGROUPED_ID,
+      group: null,
+      placements: placements.filter((p) => groupIdFor(p.key) === undefined),
+    },
+  ];
+
+  // Auto-focus a freshly-created section's name input so the user can rename it immediately.
+  const nameInputRefs = useRef(new Map<string, HTMLInputElement>());
+  const prevGroupCount = useRef(navGroups.length);
+  useEffect(() => {
+    if (navGroups.length > prevGroupCount.current) {
+      const last = orderedGroups[orderedGroups.length - 1];
+      const el = last && nameInputRefs.current.get(last.id);
+      el?.focus();
+      el?.select();
+    }
+    prevGroupCount.current = navGroups.length;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navGroups.length]);
+
+  if (placements.length === 0) {
+    return <p className="text-xs text-muted-foreground px-1">No sections yet — add one from the Widget Drawer.</p>;
+  }
+
+  return (
+    <div ref={containerRef} className="outline-grid-wrapper">
+      <button type="button" className="outline-new-section-btn" onClick={onCreateGroup} title="Add a new section">
+        + Section
+      </button>
+      {buckets.map((bucket) => (
+        <div
+          key={bucket.id}
+          ref={(el) => {
+            if (el) sectionRefs.current.set(bucket.id, el);
+            else sectionRefs.current.delete(bucket.id);
+          }}
+          className={`outline-section${bucket.id === dragOverSectionId ? " outline-section--drop-target" : ""}`}
+        >
+          {bucket.group ? (
+            <div className="outline-section-header">
+              <input
+                ref={(el) => {
+                  if (el) nameInputRefs.current.set(bucket.group!.id, el);
+                  else nameInputRefs.current.delete(bucket.group!.id);
+                }}
+                className="outline-section-name-input"
+                value={bucket.group.name}
+                onChange={(e) => onRenameGroup(bucket.group!.id, e.target.value)}
+                aria-label="Section name"
+              />
+              <button
+                type="button"
+                className="outline-section-eye-btn"
+                onClick={() => onToggleGroupVisible(bucket.group!.id)}
+                title={
+                  bucket.group.showInNav
+                    ? "Showing in the theme header — click to hide this link"
+                    : "Hidden from the theme header — click to show this link"
+                }
+              >
+                {bucket.group.showInNav ? <Eye size={13} /> : <EyeOff size={13} />}
+              </button>
+              <div className="outline-section-controls-extra">
+                <button type="button" onClick={() => onReorderGroup(bucket.group!.id, "up")} title="Move section up">
+                  <ChevronUp size={13} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onReorderGroup(bucket.group!.id, "down")}
+                  title="Move section down"
+                >
+                  <ChevronDown size={13} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDeleteGroup(bucket.group!.id)}
+                  title="Delete section — its widgets stay, just ungrouped"
+                >
+                  <X size={13} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="outline-section-header outline-section-header--ungrouped">
+              <span className="outline-section-name-input outline-section-name-input--static">Ungrouped</span>
+            </div>
+          )}
+
+          {bucket.placements.length > 0 ? (
+            <OutlineSectionGrid
+              placements={bucket.placements}
+              widgets={widgets}
+              allWidgetDefs={allWidgetDefs}
+              isLockedWidth={isLockedWidth}
+              sectionId={bucket.id}
+              sectionRefs={sectionRefs}
+              containerRef={containerRef}
+              onToggleVisible={onToggleVisible}
+              onRemoveWidget={onRemoveWidget}
+              onLayoutChange={onLayoutChange}
+              onDraggingChange={handleDraggingChange}
+              onDragOverSection={setDragOverSectionId}
+              onDropOnSection={handleDropOnSection}
+            />
+          ) : (
+            draggingActive && <div className="outline-section-drop-hint">Drop here</div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+interface OutlineSectionGridProps {
+  /** This bucket's subset of the one globally-resolved placement array — coordinates are in the
+   *  shared/global row space, rebased to a local origin only for this RGL instance's own props. */
+  placements: ResolvedGridItem[];
+  widgets: WidgetInstance[];
+  allWidgetDefs: WidgetDef[];
+  isLockedWidth: (key: string) => boolean;
+  sectionId: string;
+  sectionRefs: MutableRefObject<Map<string, HTMLDivElement>>;
+  containerRef: RefObject<HTMLDivElement | null>;
+  onToggleVisible: (key: string) => void;
+  onRemoveWidget: (key: string) => void;
+  onLayoutChange: (positions: GridPositionUpdate[]) => void;
+  onDraggingChange?: (dragging: boolean) => void;
+  onDragOverSection: (id: string | null) => void;
+  onDropOnSection: (widgetKey: string, targetSectionId: string) => void;
+}
+
+function OutlineSectionGrid({
+  placements,
+  widgets,
+  allWidgetDefs,
+  isLockedWidth,
+  sectionId,
+  sectionRefs,
+  containerRef,
+  onToggleVisible,
+  onRemoveWidget,
+  onLayoutChange,
+  onDraggingChange,
+  onDragOverSection,
+  onDropOnSection,
+}: OutlineSectionGridProps) {
+  const minY = Math.min(...placements.map((p) => p.y));
+  const dragStart = useRef<{ i: string; x: number; y: number } | null>(null);
   const [deleteCandidate, setDeleteCandidate] = useState<string | null>(null);
+  // Set right before a cross-section reassignment fires, so the very next onLayoutChange (RGL
+  // always fires one right after onDragStop, even for a drag that's "leaving" this section) skips
+  // persisting a position for that widget — it's no longer this section's to position.
+  const suppressNextLayoutKey = useRef<string | null>(null);
 
   const layout: RGLLayoutItem[] = placements.map((p) => {
     const locked = isLockedWidth(p.key);
     return {
       i: p.key,
       x: p.x,
-      y: p.y,
+      y: p.y - minY,
       w: p.w,
       h: p.h,
       minW: locked ? 2 : 1,
       maxW: 2,
       minH: 1,
       maxH: 2,
-      // react-grid-layout only resizes cleanly from the bottom-right corner — the item's own
-      // (x, y) anchor never moves during a resize, so a "nw"/"ne"/"sw" handle would visibly grow
-      // the card in the wrong direction relative to whichever corner was dragged. Only "se" is
-      // ever a real drag target (see the 3 decorative corner marks in the render below); a
-      // locked-width card still gets it since height stays adjustable even though width is
-      // clamped back to 2 regardless of horizontal drag distance.
       resizeHandles: ["se"],
     };
   });
@@ -93,92 +320,124 @@ export function OutlineSidebar({
   );
 
   const handleDrag = useCallback(
-    (_layout: RGLLayoutItem[], _oldItem: RGLLayoutItem, newItem: RGLLayoutItem, _placeholder: RGLLayoutItem, event: MouseEvent) => {
+    (
+      _layout: RGLLayoutItem[],
+      _oldItem: RGLLayoutItem,
+      newItem: RGLLayoutItem,
+      _placeholder: RGLLayoutItem,
+      event: MouseEvent
+    ) => {
       const rect = containerRef.current?.getBoundingClientRect();
-      const outside = !!rect && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom);
-      setDeleteCandidate(outside ? newItem.i : null);
+      const outsideSidebar =
+        !!rect &&
+        (event.clientX < rect.left ||
+          event.clientX > rect.right ||
+          event.clientY < rect.top ||
+          event.clientY > rect.bottom);
+      if (outsideSidebar) {
+        setDeleteCandidate(newItem.i);
+        onDragOverSection(null);
+        return;
+      }
+      setDeleteCandidate(null);
+      onDragOverSection(findHoveredOtherSection(event.clientX, event.clientY, sectionRefs.current, sectionId));
     },
-    []
+    [containerRef, sectionRefs, sectionId, onDragOverSection]
   );
 
   const handleDragStop = useCallback(
-    (_layout: RGLLayoutItem[], _oldItem: RGLLayoutItem, newItem: RGLLayoutItem) => {
+    (
+      _layout: RGLLayoutItem[],
+      _oldItem: RGLLayoutItem,
+      newItem: RGLLayoutItem,
+      _placeholder: RGLLayoutItem,
+      event: MouseEvent
+    ) => {
       const start = dragStart.current;
       dragStart.current = null;
       onDraggingChange?.(false);
+      onDragOverSection(null);
+
       if (deleteCandidate === newItem.i) {
         setDeleteCandidate(null);
         onRemoveWidget(newItem.i);
         return;
       }
+
+      const targetSection = findHoveredOtherSection(event.clientX, event.clientY, sectionRefs.current, sectionId);
+      if (targetSection) {
+        suppressNextLayoutKey.current = newItem.i;
+        onDropOnSection(newItem.i, targetSection);
+        return;
+      }
+
       if (start && start.i === newItem.i && start.x === newItem.x && start.y === newItem.y) {
         onToggleVisible(newItem.i);
       }
     },
-    [deleteCandidate, onDraggingChange, onRemoveWidget, onToggleVisible]
+    [deleteCandidate, onDraggingChange, onDragOverSection, onDropOnSection, onRemoveWidget, onToggleVisible, sectionRefs, sectionId]
   );
 
   const handleLayoutChange = useCallback(
     (newLayout: RGLLayoutItem[]) => {
-      onLayoutChange(newLayout.map((l) => ({ key: l.i, x: l.x, y: l.y, w: l.w, h: l.h })));
+      const suppressed = suppressNextLayoutKey.current;
+      suppressNextLayoutKey.current = null;
+      const positions = newLayout
+        .filter((l) => l.i !== suppressed)
+        .map((l) => ({ key: l.i, x: l.x, y: l.y + minY, w: l.w, h: l.h }));
+      if (positions.length > 0) onLayoutChange(positions);
     },
-    [onLayoutChange]
+    [onLayoutChange, minY]
   );
 
-  if (placements.length === 0) {
-    return <p className="text-xs text-muted-foreground px-1">No sections yet — add one from the Widget Drawer.</p>;
-  }
-
   return (
-    <div ref={containerRef} className="outline-grid-wrapper">
-      <ResizableGridLayout
-        className="outline-grid no-scrollbar"
-        layout={layout}
-        cols={2}
-        rowHeight={60}
-        margin={[8, 8]}
-        compactType="vertical"
-        preventCollision={false}
-        resizeHandles={["se"]}
-        onDragStart={handleDragStart}
-        onDrag={handleDrag}
-        onDragStop={handleDragStop}
-        onLayoutChange={handleLayoutChange}
-      >
-        {placements.map((p) => {
-          const instance = widgets.find((w) => w.key === p.key);
-          if (!instance) return null;
-          const def = allWidgetDefs.find((w) => w.manifest.key === instance.key);
-          const section = def?.manifest.section ?? instance.key;
-          const Icon = sectionIcon(section);
-          const color = sectionColor(section);
-          const label = def?.manifest.label ?? sectionLabel(section);
-          const pendingDelete = deleteCandidate === p.key;
-          return (
-            <div
-              key={p.key}
-              className={`outline-card${!instance.visible ? " outline-card--disabled" : ""}${pendingDelete ? " outline-card--delete-pending" : ""}`}
-              title={
-                pendingDelete
-                  ? `Drop to remove ${label} permanently`
-                  : instance.visible
-                    ? `${label} — click to hide`
-                    : `${label} — click to show`
-              }
-            >
-              <span className="outline-card-icon" style={{ backgroundColor: `${color}22`, color }}>
-                <Icon size={14} />
-              </span>
-              <span className="outline-card-label">{label}</span>
-              {/* Purely decorative — hover affordance only. Real resizing only ever happens via
-                  the bottom-right react-resizable handle (see the resizeHandles comment above). */}
-              <span className="outline-card-corner outline-card-corner--nw" aria-hidden="true" />
-              <span className="outline-card-corner outline-card-corner--ne" aria-hidden="true" />
-              <span className="outline-card-corner outline-card-corner--sw" aria-hidden="true" />
-            </div>
-          );
-        })}
-      </ResizableGridLayout>
-    </div>
+    <ResizableGridLayout
+      className="outline-grid no-scrollbar"
+      layout={layout}
+      cols={2}
+      rowHeight={52}
+      margin={[8, 8]}
+      compactType="vertical"
+      preventCollision={false}
+      resizeHandles={["se"]}
+      onDragStart={handleDragStart}
+      onDrag={handleDrag}
+      onDragStop={handleDragStop}
+      onLayoutChange={handleLayoutChange}
+    >
+      {placements.map((p) => {
+        const instance = widgets.find((w) => w.key === p.key);
+        if (!instance) return null;
+        const def = allWidgetDefs.find((w) => w.manifest.key === instance.key);
+        const section = def?.manifest.section ?? instance.key;
+        const Icon = sectionIcon(section);
+        const color = sectionColor(section);
+        const label = def?.manifest.label ?? sectionLabel(section);
+        const pendingDelete = deleteCandidate === p.key;
+        return (
+          <div
+            key={p.key}
+            className={`outline-card${!instance.visible ? " outline-card--disabled" : ""}${pendingDelete ? " outline-card--delete-pending" : ""}`}
+            title={
+              pendingDelete
+                ? `Drop to remove ${label} permanently`
+                : instance.visible
+                  ? `${label} — click to hide, drag to resize/move/reassign to another section`
+                  : `${label} — click to show, drag to resize/move/reassign to another section`
+            }
+          >
+            <span className="outline-card-icon" style={{ backgroundColor: `${color}22`, color }}>
+              <Icon size={14} />
+            </span>
+            <span className="outline-card-label">{label}</span>
+            {/* Purely decorative — hover affordance only. Real resizing only ever happens via
+                the bottom-right react-resizable handle (see the resizeHandles comment above). */}
+            <span className="outline-card-corner outline-card-corner--nw" aria-hidden="true" />
+            <span className="outline-card-corner outline-card-corner--ne" aria-hidden="true" />
+            <span className="outline-card-corner outline-card-corner--sw" aria-hidden="true" />
+          </div>
+        );
+      })}
+    </ResizableGridLayout>
   );
 }

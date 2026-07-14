@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { listThemes } from "@portfolio/themes";
-import { Button, Dialog, DialogContent, DialogTitle, useToast } from "@portfolio/ui-kit";
-import { BuyThemeButton } from "../editor/BuyThemeButton";
+import { Dialog, DialogContent, DialogTitle, useToast } from "@portfolio/ui-kit";
+import { ThemeCard } from "../ThemeCard";
 
 interface NewPortfolioDialogProps {
   open: boolean;
@@ -66,36 +66,16 @@ export function NewPortfolioDialog({ open, onOpenChange }: NewPortfolioDialogPro
         <DialogTitle>Pick a theme for your new portfolio</DialogTitle>
         <p className="text-sm text-muted-foreground mb-4">You can change this any time from within the editor.</p>
         <div className="grid grid-cols-2 gap-3">
-          {themes.map((t) => {
-            const isOwned = !t.manifest.isPremium || owned[t.manifest.id];
-            return (
-              <div
-                key={t.manifest.id}
-                className="rounded-xl border border-white/10 bg-white/5 p-4 flex flex-col gap-2"
-              >
-                <span className="text-sm font-medium">{t.manifest.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  {t.manifest.isPremium ? `₹${t.manifest.priceInPaise / 100}` : "Free"}
-                </span>
-                {isOwned ? (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => createWithTheme(t.manifest.id)}
-                    disabled={creatingThemeId !== null}
-                  >
-                    {creatingThemeId === t.manifest.id ? "Creating…" : "Use this theme"}
-                  </Button>
-                ) : (
-                  <BuyThemeButton
-                    themeId={t.manifest.id}
-                    priceInPaise={t.manifest.priceInPaise}
-                    onPurchased={() => createWithTheme(t.manifest.id)}
-                  />
-                )}
-              </div>
-            );
-          })}
+          {themes.map((t) => (
+            <ThemeCard
+              key={t.manifest.id}
+              theme={t}
+              owned={!t.manifest.isPremium || Boolean(owned[t.manifest.id])}
+              busy={creatingThemeId === t.manifest.id}
+              onUse={createWithTheme}
+              onPurchased={createWithTheme}
+            />
+          ))}
         </div>
       </DialogContent>
     </Dialog>

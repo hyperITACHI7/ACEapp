@@ -1,15 +1,15 @@
 import { prisma } from "@portfolio/db";
 
-export interface DailyPoint {
-  date: string;
-  views: number;
-  uniqueVisitors: number;
-}
+const BUCKET_HOURS = 4;
+const BUCKET_COUNT = 24 / BUCKET_HOURS;
 
 export interface AnalyticsSummary {
-  totalViews: number;
-  totalUniqueVisitors: number;
-  daily: DailyPoint[];
+  todayViews: number;
+  todayUniqueVisitors: number;
+  changePct: number | null;
+  /** Today, split into 4-hour buckets (6 total) for the dashboard's intraday trend charts. */
+  hourlyViews: number[];
+  hourlyUniqueVisitors: number[];
 }
 
 function startOfDay(d: Date): Date {
@@ -19,34 +19,39 @@ function startOfDay(d: Date): Date {
 }
 
 /**
- * Rollups cover everything through yesterday; today's not-yet-rolled-up events are aggregated
- * live so the dashboard doesn't have a same-day gap.
+ * All stats are for today (UTC) only, aggregated live from raw events since today isn't rolled
+ * up yet. The day-over-day change compares against yesterday's completed rollup.
  */
 export async function getAnalyticsSummary(portfolioId: string): Promise<AnalyticsSummary> {
-  const since = new Date();
-  since.setUTCDate(since.getUTCDate() - 30);
-
-  const rollups = await prisma.analyticsDailyRollup.findMany({
-    where: { portfolioId, date: { gte: startOfDay(since) } },
-    orderBy: { date: "asc" },
-  });
-
   const todayStart = startOfDay(new Date());
-  const todaysEvents = await prisma.analyticsEvent.findMany({
-    where: { portfolioId, isBot: false, createdAt: { gte: todayStart } },
-    select: { visitorHash: true },
-  });
+  const yesterdayStart = new Date(todayStart);
+  yesterdayStart.setUTCDate(yesterdayStart.getUTCDate() - 1);
+
+  const [todaysEvents, yesterdayRollup] = await Promise.all([
+    prisma.analyticsEvent.findMany({
+      where: { portfolioId, isBot: false, createdAt: { gte: todayStart } },
+      select: { createdAt: true, visitorHash: true },
+    }),
+    prisma.analyticsDailyRollup.findFirst({
+      where: { portfolioId, date: yesterdayStart },
+      select: { views: true },
+    }),
+  ]);
+
+  const hourlyViews = Array<number>(BUCKET_COUNT).fill(0);
+  const bucketVisitors: Set<string>[] = Array.from({ length: BUCKET_COUNT }, () => new Set());
+  for (const event of todaysEvents) {
+    const bucket = Math.min(Math.floor(event.createdAt.getUTCHours() / BUCKET_HOURS), BUCKET_COUNT - 1);
+    hourlyViews[bucket] += 1;
+    bucketVisitors[bucket].add(event.visitorHash);
+  }
+  const hourlyUniqueVisitors = bucketVisitors.map((s) => s.size);
+
   const todayViews = todaysEvents.length;
-  const todayUnique = new Set(todaysEvents.map((e) => e.visitorHash)).size;
+  const todayUniqueVisitors = new Set(todaysEvents.map((e) => e.visitorHash)).size;
 
-  const daily: DailyPoint[] = [
-    ...rollups.map((r) => ({ date: r.date.toISOString().slice(0, 10), views: r.views, uniqueVisitors: r.uniqueVisitors })),
-    { date: todayStart.toISOString().slice(0, 10), views: todayViews, uniqueVisitors: todayUnique },
-  ];
+  const yesterdayViews = yesterdayRollup?.views ?? 0;
+  const changePct = yesterdayViews > 0 ? Math.round(((todayViews - yesterdayViews) / yesterdayViews) * 100) : null;
 
-  return {
-    totalViews: daily.reduce((sum, d) => sum + d.views, 0),
-    totalUniqueVisitors: daily.reduce((sum, d) => sum + d.uniqueVisitors, 0),
-    daily,
-  };
+  return { todayViews, todayUniqueVisitors, changePct, hourlyViews, hourlyUniqueVisitors };
 }

@@ -1,8 +1,158 @@
 /* Outline sidebar: the same 2-column grid the rendered portfolio uses, but as an editing tool —
  * plain icon+label cards (react-grid-layout), resized by dragging a corner, repositioned by
- * dragging the card, visibility toggled by clicking it (a "drag" that ends where it started). */
+ * dragging the card, visibility toggled by clicking it (a "drag" that ends where it started).
+ * Widgets are grouped into user-named sections (see .outline-section below); each section is its
+ * own independent grid instance, so a card's drag/resize/click mechanics above are scoped per
+ * section, not to the whole sidebar. Dragging a card over a *different* section's block moves it
+ * there (see OutlineSidebar.tsx's findHoveredOtherSection) — .outline-section--drop-target below
+ * is the only visual feedback for that, kept deliberately minimal so the sidebar reads as a
+ * compact summary rather than a busy list at rest. */
 .outline-grid-wrapper {
   overflow: visible;
+}
+
+.outline-new-section-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  background: none;
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.outline-new-section-btn:hover {
+  border-color: var(--primary);
+  color: var(--foreground);
+}
+
+.outline-section {
+  margin-bottom: 0.625rem;
+  border-radius: 0.75rem;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* The only feedback that a section is the current drag-and-drop target — deliberately just a
+ * background tint + inset ring, no layout shift, so hovering it while dragging doesn't jitter
+ * anything else in the list. */
+.outline-section--drop-target {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.outline-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 0.375rem;
+  padding: 0 0.15rem;
+}
+
+.outline-section-name-input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  padding: 0.1rem 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  outline: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.outline-section-name-input:hover,
+.outline-section-name-input:focus {
+  color: var(--foreground);
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.outline-section-name-input--static {
+  flex: 1;
+  cursor: default;
+}
+
+.outline-section-header--ungrouped {
+  opacity: 0.7;
+}
+
+/* Status indicator, not just an action — stays visible at rest so a hidden-from-nav section is
+ * glanceable without needing to hover. */
+.outline-section-eye-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.4rem;
+  border: none;
+  background: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.outline-section-eye-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--foreground);
+}
+
+/* Reorder/delete are pure actions (not state to glance at), so they stay out of the way until
+ * the section header is actually being interacted with — opacity only (never display:none), so
+ * they're still keyboard-tabbable and screen-reader-reachable even when visually faded. */
+.outline-section-controls-extra {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.outline-section-header:hover .outline-section-controls-extra,
+.outline-section-header:focus-within .outline-section-controls-extra {
+  opacity: 1;
+}
+
+.outline-section-controls-extra button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.4rem;
+  border: none;
+  background: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.outline-section-controls-extra button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--foreground);
+}
+
+/* Only shown for an empty section while some card, anywhere in the sidebar, is actively being
+ * dragged — an empty section has no grid to serve as a drop target otherwise, but showing this
+ * permanently would add back exactly the visual bulk Part 2 is trying to remove. */
+.outline-section-drop-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.25rem;
+  border-radius: 0.6rem;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
 }
 
 .outline-grid {

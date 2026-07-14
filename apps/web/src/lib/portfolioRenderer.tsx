@@ -46,7 +46,7 @@ export function PortfolioRenderer({ data }: PortfolioRendererProps) {
   const palette = theme.manifest.palettes.includes(data.palette) ? data.palette : theme.manifest.defaultPalette;
 
   const visibleWidgets = data.widgets.filter((w) => w.visible);
-  const placements = resolveGridLayout(visibleWidgets, (key) => getWidget(key)?.manifest.lockedWidth === true);
+  const placements = resolveGridLayout(visibleWidgets, data.navGroups ?? [], (key) => getWidget(key)?.manifest.lockedWidth === true);
 
   const gridItems = placements.flatMap(({ key, x, y, w, h }) => {
     const instance = visibleWidgets.find((v) => v.key === key);

@@ -13,7 +13,7 @@ interface GithubImportModalProps {
 }
 
 const fieldClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-purple-400/60 focus:bg-white/8 focus:shadow-[0_0_0_3px_rgba(168,85,247,0.15)] transition-all";
+  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-white/40 focus:bg-white/8 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.12)] transition-all";
 
 export function GithubImportModal({ portfolioId, github, onConnected, onImported }: GithubImportModalProps) {
   const { showToast } = useToast();
@@ -103,7 +103,7 @@ export function GithubImportModal({ portfolioId, github, onConnected, onImported
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-        {connectError && <p className="text-xs text-red-400">{connectError}</p>}
+        {connectError && <p className="text-xs text-destructive">{connectError}</p>}
         <Button onClick={connect} disabled={connecting || !username} className="self-start">
           {connecting ? "Connecting…" : "Connect"}
         </Button>
@@ -120,12 +120,12 @@ export function GithubImportModal({ portfolioId, github, onConnected, onImported
         </Button>
       ) : (
         <div className="flex flex-col gap-3">
-          {reposError && <p className="text-xs text-red-400">{reposError}</p>}
+          {reposError && <p className="text-xs text-destructive">{reposError}</p>}
           {repos.length === 0 && !loadingRepos && <p className="text-sm text-muted-foreground">No public repos found — add projects manually instead.</p>}
           <div className="max-h-60 overflow-y-auto flex flex-col gap-1 rounded-xl border border-white/10 bg-white/[0.02] p-2">
             {repos.map((r) => (
               <label key={r.id} className="flex items-center gap-2 py-1.5 px-2 text-sm rounded-lg hover:bg-white/5">
-                <input type="checkbox" checked={selected.has(r.id)} onChange={() => toggle(r.id)} className="accent-purple-500" />
+                <input type="checkbox" checked={selected.has(r.id)} onChange={() => toggle(r.id)} className="accent-white" />
                 <span>{r.name}</span>
               </label>
             ))}

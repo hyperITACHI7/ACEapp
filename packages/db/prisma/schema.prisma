@@ -13,6 +13,10 @@ model User {
   passwordHash          String
   username              String?   @unique
   usernameChangedAt     DateTime?
+  name                  String? // account display name, shown in the sidebar profile card
+  avatarUrl             String? // account-level avatar, distinct from a portfolio's own Profile.photoUrl
+  emailDigestEnabled    Boolean   @default(true)
+  securityAlertsEnabled Boolean   @default(true)
   referralCode          String    @unique
   referredByUserId      String?
   referredBy            User?     @relation("Referrals", fields: [referredByUserId], references: [id])

@@ -42,28 +42,48 @@
    not already used verbatim somewhere in apps/web's own source should use an inline style instead
    for that specific property — see packages/ui-kit/src/Dialog.tsx for the pattern. */
 
-/* Design tokens ported from the imported Login Page design (Login Page/src/styles/theme.css) —
-   this app is fully dark, no light/dark toggle, so the source's `.dark` overrides are dropped. */
+/* "Aether" design tokens — ported from the teammate's frontend-ui-reference prototype
+   (Portfolio Builder UI/src/index.css) onto our EXISTING variable names, so every component
+   already referencing `bg-background`/`text-foreground`/`border-border`/etc. picks up the new
+   values automatically with zero call-site changes. Deliberately monochrome black/white/gray
+   (the prototype's *shipped* palette, not its original colorful design-brief draft) — `--accent`
+   is the one "bright" token (pure white), used for hover/focus highlights and the health-score
+   ring; `--destructive` stays a real color since errors should still read as errors. This is the
+   app's own builder/dashboard/editor chrome — entirely separate from a published portfolio's own
+   per-theme palette (each theme package's own palettes.ts), which is unaffected by any of this. */
 :root {
-  --background: #08080f;
-  --foreground: #f0f0ff;
-  --card: rgba(18, 18, 30, 0.85);
-  --card-foreground: #f0f0ff;
-  --popover: #12121e;
-  --popover-foreground: #f0f0ff;
-  --primary: #a855f7;
-  --primary-foreground: #ffffff;
-  --secondary: #1e1e2e;
-  --secondary-foreground: #c4c4dc;
-  --muted: #1a1a28;
-  --muted-foreground: #7878a0;
-  --accent: #06b6d4;
-  --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: rgba(168, 85, 247, 0.15);
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --card: #171717;
+  --card-foreground: #ffffff;
+  --popover: #171717;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #0a0a0a;
+  --secondary: #1c2022;
+  --secondary-foreground: #e0e3e5;
+  --muted: #1c2022;
+  --muted-foreground: #c4c7c8;
+  /* A step lighter than the sidebar's own --card, used for opaque panels/cards on the aurora
+     pages (dashboard/onboarding/explore/assets/settings) — kept close to neutral gray on purpose
+     so the two surfaces read as clearly distinct without the panel looking like a separate color. */
+  --panel: #1b1b1b;
+  --panel-foreground: #ffffff;
+  --accent: #ffffff;
+  --accent-foreground: #0a0a0a;
+  --destructive: #ffb4ab;
+  --destructive-foreground: #690005;
+  /* The one other spot of real color: "live"/match-score/positive-status pills, per the design
+     system's rule that color is reserved for success and error states only. */
+  --success: #10b981;
+  --success-foreground: #10b981;
+  /* Third color band, added for the dashboard's health-status readout ("Needs Work") — same
+     reserved-for-status-only rule as success/destructive, not a general-purpose accent. */
+  --warning: #eab308;
+  --warning-foreground: #eab308;
+  --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.05);
-  --ring: rgba(168, 85, 247, 0.5);
+  --ring: rgba(255, 255, 255, 0.3);
   --radius: 0.625rem;
 }
 
@@ -80,10 +100,16 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-panel: var(--panel);
+  --color-panel-foreground: var(--panel-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -96,6 +122,13 @@
   /* Wired to next/font CSS variables set on <html> in layout.tsx */
   --font-sans: var(--font-plus-jakarta), ui-sans-serif, sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, sans-serif;
+
+  /* ACEapp landing page tokens, scoped to .folio-landing below — kept verbatim from the
+     teammate's reference project so the marketing page renders exactly as designed,
+     isolated from the app's own Aether chrome tokens above. */
+  --color-ink: #0a0a0b;
+  --color-cream: #f5f2ec;
+  --tracking-tightest: -0.045em;
 }
 
 @layer base {
@@ -108,13 +141,75 @@
     @apply bg-background text-foreground;
   }
 
+  /* Dual-font system matching the prototype: Inter for body/UI text by default, Plus Jakarta
+     Sans reserved for headings — the opposite of this file's old default (Plus Jakarta for
+     everything, Inter only opted into via an explicit `font-body` class in a few spots). */
   body {
+    font-family: var(--font-body);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-sans);
   }
 }
 
 ::selection {
-  background: rgba(168, 85, 247, 0.35);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Elevation per the prototype: flat cards get a translucent fill + blur + thin border and
+ * NEVER a shadow; only modals/panels (glass-panel) get the heavier floating treatment. Values
+ * match Portfolio Builder UI/src/index.css's `.glass-card`/`.glass-panel` exactly. */
+.glass-card {
+  background: rgba(23, 23, 23, 0.6);
+  backdrop-filter: blur(24px);
+  border: 1px solid #262626;
+}
+
+.glass-panel {
+  background: rgba(23, 23, 23, 0.7);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(38, 38, 38, 0.5);
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* ACEapp landing page — scoped so it renders exactly as designed, isolated from the app's
+   own dark/glass chrome above (see the token comment near --color-ink). */
+.folio-landing {
+  color: var(--color-cream);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+.folio-landing h1,
+.folio-landing h2,
+.folio-landing h3,
+.folio-landing h4 {
+  font-family: inherit;
+  margin: revert;
+}
+
+.folio-landing p {
+  margin: revert;
+}
+
+.folio-landing ::selection {
+  background: rgba(255, 140, 120, 0.35);
+}
+
+.folio-landing .text-balance {
+  text-wrap: balance;
+}
+
+.folio-landing .grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* ============================================================================

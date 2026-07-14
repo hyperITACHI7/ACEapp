@@ -170,7 +170,9 @@ export function GalleryAnimatedComponent({ data, config, instanceKey }: WidgetPr
   const heading = typeof config.heading === "string" ? config.heading : "Projects I'm\nproud of";
   const projects = editing ? data.projects : data.projects.filter((p) => !p.sourceUnavailable);
 
-  const grid = resolveGridLayout(data.widgets.filter((w) => w.visible)).find((g) => g.key === instanceKey);
+  const grid = resolveGridLayout(data.widgets.filter((w) => w.visible), data.navGroups ?? []).find(
+    (g) => g.key === instanceKey
+  );
   const { slotCount, scroll, narrow } = sizeConfig(grid?.w ?? 2, grid?.h ?? 1);
   const chunks = chunk(projects, slotCount);
   const hasMore = projects.length > slotCount;

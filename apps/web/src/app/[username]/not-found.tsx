@@ -9,7 +9,7 @@ export default function PortfolioNotFound() {
       </p>
       <Link
         href="/signup"
-        className="mt-6 inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-bold text-white bg-gradient-to-br from-purple-500 via-pink-500 to-cyan-400 hover:brightness-110 shadow-lg shadow-purple-500/20 transition-all active:scale-[0.98]"
+        className="mt-6 inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all active:scale-[0.98]"
       >
         Create your own portfolio
       </Link>

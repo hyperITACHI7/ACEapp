@@ -10,7 +10,7 @@ import { GithubImportModal } from "./GithubImportModal";
 import { ResumeImportPanel } from "./ResumeImportPanel";
 
 const fieldClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-purple-400/60 focus:bg-white/8 focus:shadow-[0_0_0_3px_rgba(168,85,247,0.15)] transition-all";
+  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-white/40 focus:bg-white/8 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.12)] transition-all";
 const labelClass = "block text-sm font-medium text-muted-foreground mb-1.5";
 
 interface SettingsModalProps {
@@ -57,7 +57,7 @@ export function SettingsModal({
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Theme</h3>
             <ThemeSwitcher themeId={draft.themeId} onChange={onRequestThemeChange} />
             {pendingPurchaseThemeId && (
-              <div className="rounded-xl border border-purple-400/20 bg-purple-500/5 p-4 flex flex-col gap-2">
+              <div className="rounded-lg border border-white/15 bg-white/5 p-4 flex flex-col gap-2">
                 <p className="text-sm text-muted-foreground">
                   This is a premium theme — purchase it to switch your portfolio to it.
                 </p>

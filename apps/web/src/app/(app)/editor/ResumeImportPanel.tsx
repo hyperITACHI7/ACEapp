@@ -120,7 +120,7 @@ export function ResumeImportPanel({ draft, updateDraft }: ResumeImportPanelProps
         }}
       />
       {uploading && <p className="text-xs text-muted-foreground">Parsing resume…</p>}
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }
