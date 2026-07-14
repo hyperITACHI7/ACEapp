@@ -1,14 +1,20 @@
+/* Flexbox grow-from-minimum, not a breakpoint: `flex-wrap`'s line-fit decision is made against
+ * each item's flex-BASIS, before any shrinking — so a large "preferred size" basis (e.g. the
+ * widths these two columns want at full desktop size) wraps to a stack far too early, before
+ * shrinking is ever attempted. Setting the basis to each column's actual MINIMUM instead, and
+ * letting `flex-grow` fill any leftover width up to a cap, means the browser only wraps once the
+ * combined minimums genuinely don't fit — real "shrink (from a floor) before restyling." */
 .widget-about-animated-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 3rem;
   align-items: center;
 }
 
-@media (min-width: 1024px) {
-  .widget-about-animated-grid {
-    grid-template-columns: 3fr 2fr;
-  }
+.widget-about-animated-text {
+  flex: 3 1 200px; /* grow ratio 3 (vs portrait's 2) echoes the old 3fr:2fr split once both are
+                       past their minimums */
+  min-width: 0; /* lets a long unbroken bio actually shrink/wrap instead of overflowing */
 }
 
 .widget-about-animated-bio {
@@ -20,7 +26,11 @@
 
 .widget-about-animated-stats {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  /* `minmax(0, 1fr)`, not plain `1fr` (== `minmax(auto, 1fr)`) — the `auto` floor is each
+   * column's content-based min-content width (~130px per stat box here), which would blow out
+   * of `.widget-about-animated-text` once flexbox compresses it below that combined width
+   * instead of letting these columns shrink too. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem;
   margin-top: 3rem;
 }
@@ -70,18 +80,14 @@
 
 .widget-about-animated-portrait {
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /* also what makes flexbox's automatic min-width resolve to 0 below, rather
+                        than an unshrinkable content-based floor — required for the shrink below */
   aspect-ratio: 3 / 4;
   background: var(--card, #0e0e1c);
-  width: 100%;
+  flex: 2 1 140px; /* basis == its floor (min-width below); was `width:100%` (assumed a
+                       grid-column context) — grows up to max-width:320px as space allows */
   max-width: 320px;
-  justify-self: center;
-}
-
-@media (min-width: 1024px) {
-  .widget-about-animated-portrait {
-    justify-self: end;
-  }
+  min-width: 140px; /* floor before the row wraps to a stack */
 }
 
 .widget-about-animated-photo {

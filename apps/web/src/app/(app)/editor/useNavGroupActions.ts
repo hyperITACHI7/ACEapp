@@ -34,8 +34,8 @@ export function useNavGroupActions(updateDraft: UpdateDraft) {
   );
 
   const handleReorderGroup = useCallback(
-    (groupId: string, direction: "up" | "down") => {
-      updateDraft((prev) => reorderNavGroup(prev, groupId, direction));
+    (draggedGroupId: string, targetGroupId: string) => {
+      updateDraft((prev) => reorderNavGroup(prev, draggedGroupId, targetGroupId));
     },
     [updateDraft]
   );

@@ -20,6 +20,10 @@ import { seedDefaultNavGroups } from "./sectionOps";
 // react-grid-layout measures a real DOM width on mount and has no meaningful server-rendered
 // output for an editor-only panel, so it's loaded client-side only.
 const OutlineSidebar = dynamic(() => import("./OutlineSidebar").then((m) => m.OutlineSidebar), { ssr: false });
+const MobileOutlineSidebar = dynamic(
+  () => import("./MobileOutlineSidebar").then((m) => m.MobileOutlineSidebar),
+  { ssr: false }
+);
 
 interface EditorClientProps {
   portfolioId: string;
@@ -56,6 +60,7 @@ export function EditorClient({ portfolioId, initialData, initialVersion, publish
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [outlineCollapsed, setOutlineCollapsed] = useState(false);
   const [outlineDragging, setOutlineDragging] = useState(false);
+  const [editingBreakpoint, setEditingBreakpoint] = useState<"desktop" | "mobile">("desktop");
 
   // Normalize whenever the theme changes so newly-supported slots appear immediately.
   useEffect(() => {
@@ -63,8 +68,14 @@ export function EditorClient({ portfolioId, initialData, initialVersion, publish
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draft.themeId]);
 
-  const { handleSectionSelect, handleToggleVisible, handleLayoutChange, handleRemoveWidget } =
-    useWidgetActions(updateDraft);
+  const {
+    handleSectionSelect,
+    handleToggleVisible,
+    handleLayoutChange,
+    handleRemoveWidget,
+    handleMobileReorder,
+    handleToggleMobileVisible,
+  } = useWidgetActions(updateDraft);
 
   const {
     handleCreateGroup,
@@ -100,6 +111,8 @@ export function EditorClient({ portfolioId, initialData, initialVersion, publish
         published={published}
         saving={saving}
         onOpenSettings={() => setSettingsOpen(true)}
+        editingBreakpoint={editingBreakpoint}
+        onEditingBreakpointChange={setEditingBreakpoint}
       />
 
       <div
@@ -119,28 +132,46 @@ export function EditorClient({ portfolioId, initialData, initialVersion, publish
           >
             {outlineCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           </button>
-          {!outlineCollapsed && (
-            <OutlineSidebar
-              widgets={draft.widgets}
-              navGroups={draft.navGroups ?? []}
-              onToggleVisible={handleToggleVisible}
-              onLayoutChange={handleLayoutChange}
-              onRemoveWidget={handleRemoveWidget}
-              onDraggingChange={setOutlineDragging}
-              onCreateGroup={handleCreateGroup}
-              onRenameGroup={handleRenameGroup}
-              onToggleGroupVisible={handleToggleGroupVisible}
-              onReorderGroup={handleReorderGroup}
-              onDeleteGroup={handleDeleteGroup}
-              onAssignGroup={handleAssignGroup}
-            />
-          )}
+          {!outlineCollapsed &&
+            (editingBreakpoint === "mobile" ? (
+              <MobileOutlineSidebar
+                widgets={draft.widgets}
+                navGroups={draft.navGroups ?? []}
+                onToggleMobileVisible={handleToggleMobileVisible}
+                onReorder={handleMobileReorder}
+              />
+            ) : (
+              <OutlineSidebar
+                widgets={draft.widgets}
+                navGroups={draft.navGroups ?? []}
+                onToggleVisible={handleToggleVisible}
+                onLayoutChange={handleLayoutChange}
+                onRemoveWidget={handleRemoveWidget}
+                onDraggingChange={setOutlineDragging}
+                onCreateGroup={handleCreateGroup}
+                onRenameGroup={handleRenameGroup}
+                onToggleGroupVisible={handleToggleGroupVisible}
+                onReorderGroup={handleReorderGroup}
+                onDeleteGroup={handleDeleteGroup}
+                onAssignGroup={handleAssignGroup}
+              />
+            ))}
         </div>
 
         {/* Neutral frame only — the rendered portfolio has its own independent theme
-           palette and must not inherit this app's dark chrome. */}
+           palette and must not inherit this app's dark chrome. Always a fixed-ratio "device
+           screen" frame now (16:9 desktop / 9:16 mobile), driven by the explicit toggle in
+           TopBar rather than the outline sidebar's collapse state (which just frees horizontal
+           room, unrelated) — a real, fixed frame height is also what makes the editor-only
+           `cqh`-based header sizing below actually work (see globals.css). */}
         <EditorModeContext.Provider value={editorMode}>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden max-h-[85vh] overflow-y-auto no-scrollbar">
+          <div
+            className={`rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden max-h-[85vh] overflow-y-auto no-scrollbar ${
+              editingBreakpoint === "mobile"
+                ? "lg:w-full lg:mx-auto lg:max-w-[420px] lg:aspect-[9/16]"
+                : "lg:aspect-video"
+            }`}
+          >
             <EditorCanvas data={draft} />
           </div>
         </EditorModeContext.Provider>

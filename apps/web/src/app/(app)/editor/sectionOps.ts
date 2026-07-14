@@ -75,6 +75,31 @@ export function updateGridPositions(prev: PortfolioData, positions: GridPosition
   };
 }
 
+/** Persists a new mobile order for every widget at once — `orderedKeys` is the full flat
+ *  sequence (across all sections) the mobile Outline sidebar currently shows. Mobile has no
+ *  separate position/size, only order + visibility (see `WidgetInstanceSchema.mobileOrder`). */
+export function updateMobileOrder(prev: PortfolioData, orderedKeys: string[]): PortfolioData {
+  const indexByKey = new Map(orderedKeys.map((k, i) => [k, i]));
+  return {
+    ...prev,
+    widgets: prev.widgets.map((w) => (indexByKey.has(w.key) ? { ...w, mobileOrder: indexByKey.get(w.key)! } : w)),
+  };
+}
+
+/** Flips a widget's mobile-only visibility, independent of its desktop `visible` flag — falls
+ *  back to `visible` the first time it's toggled (never customized before), same "absence
+ *  inherits the desktop value" convention as `mobileOrder`/`grid`. */
+export function toggleMobileVisible(prev: PortfolioData, key: string): PortfolioData {
+  return {
+    ...prev,
+    widgets: prev.widgets.map((w) => {
+      if (w.key !== key) return w;
+      const current = w.mobileVisible ?? w.visible;
+      return { ...w, mobileVisible: !current };
+    }),
+  };
+}
+
 /** Creates a new, empty, immediately-renameable nav section appended to the end. Name is
  *  de-duped against existing section names ("New Section", "New Section 2", ...). */
 export function createNavGroup(prev: PortfolioData): PortfolioData {
@@ -102,20 +127,16 @@ export function toggleNavGroupVisible(prev: PortfolioData, groupId: string): Por
   return { ...prev, navGroups: groups.map((g) => (g.id === groupId ? { ...g, showInNav: !g.showInNav } : g)) };
 }
 
-/** Swaps a section's order with its immediate up/down neighbor — simple reordering (not
- *  drag-and-drop), since a portfolio typically only has a handful of nav sections. */
-export function reorderNavGroup(prev: PortfolioData, groupId: string, direction: "up" | "down"): PortfolioData {
+/** Moves a section to sit at another section's position — drag-and-drop reordering (grab a
+ *  section's handle, drop it on another section) rather than single-step up/down swaps. */
+export function reorderNavGroup(prev: PortfolioData, draggedId: string, targetId: string): PortfolioData {
   const groups = [...(prev.navGroups ?? [])].sort((a, b) => a.order - b.order);
-  const index = groups.findIndex((g) => g.id === groupId);
-  const swapWith = direction === "up" ? index - 1 : index + 1;
-  if (index === -1 || swapWith < 0 || swapWith >= groups.length) return prev;
-  const a = groups[index]!;
-  const b = groups[swapWith]!;
-  const navGroups = groups.map((g) => {
-    if (g.id === a.id) return { ...g, order: b.order };
-    if (g.id === b.id) return { ...g, order: a.order };
-    return g;
-  });
+  const fromIndex = groups.findIndex((g) => g.id === draggedId);
+  const toIndex = groups.findIndex((g) => g.id === targetId);
+  if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return prev;
+  const [moved] = groups.splice(fromIndex, 1);
+  groups.splice(toIndex, 0, moved!);
+  const navGroups = groups.map((g, i) => ({ ...g, order: i }));
   return { ...prev, navGroups };
 }
 

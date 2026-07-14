@@ -18,7 +18,7 @@
   gap: 0.35rem;
 }
 
-@media (min-width: 640px) {
+@container (min-width: 640px) {
   .widget-experience-animated-head {
     flex-direction: row;
     align-items: flex-start;

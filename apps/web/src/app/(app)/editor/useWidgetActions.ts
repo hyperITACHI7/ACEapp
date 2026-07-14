@@ -1,6 +1,13 @@
 import { useCallback } from "react";
 import type { PortfolioData } from "@portfolio/schema";
-import { resolveSectionDrop, updateGridPositions, removeWidgetInstance, type GridPositionUpdate } from "./sectionOps";
+import {
+  resolveSectionDrop,
+  updateGridPositions,
+  removeWidgetInstance,
+  updateMobileOrder,
+  toggleMobileVisible,
+  type GridPositionUpdate,
+} from "./sectionOps";
 
 type UpdateDraft = (updater: (prev: PortfolioData) => PortfolioData) => void;
 
@@ -39,5 +46,26 @@ export function useWidgetActions(updateDraft: UpdateDraft) {
     [updateDraft]
   );
 
-  return { handleSectionSelect, handleToggleVisible, handleLayoutChange, handleRemoveWidget };
+  const handleMobileReorder = useCallback(
+    (orderedKeys: string[]) => {
+      updateDraft((prev) => updateMobileOrder(prev, orderedKeys));
+    },
+    [updateDraft]
+  );
+
+  const handleToggleMobileVisible = useCallback(
+    (key: string) => {
+      updateDraft((prev) => toggleMobileVisible(prev, key));
+    },
+    [updateDraft]
+  );
+
+  return {
+    handleSectionSelect,
+    handleToggleVisible,
+    handleLayoutChange,
+    handleRemoveWidget,
+    handleMobileReorder,
+    handleToggleMobileVisible,
+  };
 }

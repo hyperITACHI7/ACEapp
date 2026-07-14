@@ -59,7 +59,7 @@ export function AboutAnimatedComponent({ data, config, instanceKey }: WidgetProp
   return (
     <div className="widget widget-about-animated">
       <div className="widget-about-animated-grid">
-        <div>
+        <div className="widget-about-animated-text">
           <span className="widget-eyebrow">{eyebrow}</span>
           <h2 className="widget-heading widget-heading--animated">{renderHeading(heading)}</h2>
           {editing || bio ? (

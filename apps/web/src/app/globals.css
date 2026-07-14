@@ -252,12 +252,32 @@
   min-width: 0;
 }
 
-@media (max-width: 640px) {
+/* Hidden outside the mobile breakpoint below — a widget hidden on desktop but shown on mobile
+ * (see `mobileVisible` in @portfolio/schema) never enters the desktop grid's placement/bin-pack,
+ * so it has no inline grid-column/grid-row at all; it only becomes a real grid item once the
+ * mobile breakpoint below un-hides it. */
+.theme-widget-grid-item--mobile-only {
+  display: none;
+}
+
+@container (max-width: 640px) {
   .theme-widget-grid {
     grid-template-columns: 1fr;
   }
   .theme-widget-grid-item {
     grid-column: 1 / -1 !important;
+    /* `order` only affects grid auto-placement, which requires the item to have NO explicit
+     * row — hence overriding grid-row to `auto` here too, alongside the existing grid-column
+     * override, so each widget's independent mobile order (--w-order, set in
+     * portfolioRenderer.tsx) actually takes effect instead of staying pinned to its desktop row. */
+    grid-row: auto !important;
+    order: var(--w-order, 0);
+  }
+  .theme-widget-grid-item[data-mobile-hidden="true"] {
+    display: none !important;
+  }
+  .theme-widget-grid-item--mobile-only {
+    display: block;
   }
 }
 
@@ -290,4 +310,26 @@
   content: attr(data-placeholder);
   opacity: 0.5;
   pointer-events: none;
+}
+
+/* ============================================================================
+ * Editor-only height containment — scoped via `.portfolio-canvas` (a plain wrapper div present
+ * ONLY in EditorCanvas.tsx's DOM, never on the public page), so this can never leak onto a
+ * visitor's actual portfolio. The editor's preview frame now always has a real, fixed CSS height
+ * (aspect-ratio-derived — see EditorClient.tsx's `aspect-video`/`aspect-[9/16]`); giving `.theme`
+ * ITSELF that fixed height (an earlier version of this rule did) let a height-based `@container`
+ * query (`cqh`) resolve against the frame, but `container-type: size` containment also makes an
+ * element's height independent of its content BY DEFINITION — so `.theme`'s own
+ * `background: var(--bg)` (shared-themes.css) stopped covering anything past that fixed height,
+ * and content taller than the frame visibly scrolled past an unpainted background.
+ *
+ * Fix: put the size container on `.portfolio-canvas` instead (a plain wrapper with no background
+ * of its own) and leave `.theme` as a normal auto-height box — its background still paints its
+ * full (possibly-taller-than-the-frame) height correctly. `cqh` queries below still resolve
+ * correctly: `.theme` keeps its own `container-type: inline-size` (shared-themes.css, unchanged,
+ * used by every existing width-based `@container` query), which doesn't provide the height axis,
+ * so a `cqh` query skips past it to the next ancestor container that does — `.portfolio-canvas`. */
+.portfolio-canvas {
+  height: 100%;
+  container-type: size;
 }

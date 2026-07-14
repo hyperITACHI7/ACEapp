@@ -21,7 +21,10 @@
 
 .widget-heading--animated {
   font-family: var(--font-heading, inherit);
-  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  /* `cqw`, not `vw` — scales against the portfolio's own rendered width, not the browser
+   * viewport (see `.theme`'s container-type in shared-themes.css); needed since this heading
+   * also renders inside the editor's much-narrower preview panel. */
+  font-size: clamp(2rem, 4.5cqw, 3.25rem);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.01em;
@@ -35,7 +38,7 @@
 
 .widget-heading--animated-cta {
   font-family: var(--font-heading, inherit);
-  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-size: clamp(2.5rem, 8cqw, 4.5rem);
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.02em;

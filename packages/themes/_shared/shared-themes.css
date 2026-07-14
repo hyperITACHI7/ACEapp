@@ -6,6 +6,11 @@
   background: var(--bg);
   color: var(--fg);
   min-height: 100vh;
+  /* Every size-based breakpoint below `.theme` (this file, globals.css, per-theme/per-widget
+   * CSS) queries against THIS box's width via @container, not the browser viewport — the
+   * portfolio is rendered at less than full viewport width inside the editor's preview panel,
+   * so a viewport media query would never reflect the actual space available. */
+  container-type: inline-size;
 }
 
 .theme-header {

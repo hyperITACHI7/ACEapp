@@ -20,7 +20,7 @@
   margin-bottom: 0.35rem;
 }
 
-@media (min-width: 640px) {
+@container (min-width: 640px) {
   .widget-education-animated-row {
     flex-direction: row;
     align-items: flex-start;

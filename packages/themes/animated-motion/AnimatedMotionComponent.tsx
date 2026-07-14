@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { motion, useInView } from "motion/react";
 import { useEditorMode } from "@portfolio/ui-kit";
 import { getWidget } from "@portfolio/widgets";
@@ -76,6 +77,13 @@ function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef({ x: -300, y: -300 });
   const currentRef = useRef({ x: -300, y: -300 });
+  // `.theme`'s container-query containment makes it a containing block for `position: fixed`
+  // descendants, which would turn this dot's viewport-relative left/top into theme-relative
+  // ones — portal it to `document.body` to keep it truly viewport-fixed. Gated on mount since
+  // this component still goes through SSR (no `document` there) despite being a client component.
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const dot = dotRef.current;
@@ -109,12 +117,17 @@ function CustomCursor() {
       window.removeEventListener("mouseover", onOver);
       cancelAnimationFrame(raf);
     };
-  }, []);
+    // Re-runs once `mounted` flips true and the portal below has actually attached `dotRef` —
+    // on the first (SSR-safe null) render this effect finds no `dot` and exits immediately.
+  }, [mounted]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div ref={dotRef} className="theme-cursor" aria-hidden="true">
       <div className="theme-cursor-dot" />
-    </div>
+    </div>,
+    document.body
   );
 }
 

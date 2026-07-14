@@ -1,13 +1,10 @@
 .widget-gallery-animated-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  /* `auto-fit, minmax(...)`, not a breakpoint — cards shrink fluidly and the grid drops to a
+   * single column on its own once two cards can no longer fit at their minimum width, instead
+   * of flipping at one hand-picked container size regardless of how much room is actually left. */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-  .widget-gallery-animated-grid {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
 .widget-gallery-animated-card {
@@ -25,7 +22,10 @@
 .widget-gallery-animated-image-wrap {
   position: relative;
   overflow: hidden;
-  height: clamp(220px, 28vw, 320px);
+  /* `cqw`, not `vw` — this card renders inline in the theme's own container-query context,
+   * unlike the overlay/lightbox below (portaled to `document.body`, genuinely viewport-scaled,
+   * left as `vw`). */
+  height: clamp(220px, 28cqw, 320px);
   background: var(--card, #0e0e1c);
 }
 
@@ -139,8 +139,8 @@
 }
 
 /* Size-adaptive rendering. A narrow (w=1) placement always shows a single column regardless of
-   viewport, since the widget itself only occupies half the row — the two-class combinator here
-   beats the plain media-query rule above regardless of source order, without needing !important. */
+   available width, since the widget itself only occupies half the row — the two-class combinator
+   here beats the plain auto-fit rule above regardless of source order, without needing !important. */
 .widget-gallery-animated-grid.widget-gallery-animated-grid--narrow {
   grid-template-columns: 1fr;
 }

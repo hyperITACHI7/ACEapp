@@ -1,12 +1,15 @@
 /* Skills (Motion Marquee) — full-bleed, edge to edge, no heading */
 
 .widget-skills-marquee-fullbleed {
-  width: 100vw;
+  /* `cqw`, not `vw` — this full-bleed trick should break out to `.theme`'s own edges, not the
+   * raw browser viewport; in the editor preview those are very different widths, and `vw` here
+   * pushed the marquee far outside (and misaligned from) the visible preview panel. */
+  width: 100cqw;
   position: relative;
   left: 50%;
   right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  margin-left: -50cqw;
+  margin-right: -50cqw;
   padding: 4rem 0;
   overflow: hidden;
 }

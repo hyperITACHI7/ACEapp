@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { resolveGridLayout, type PortfolioData } from "@portfolio/schema";
 import { getTheme, DEFAULT_THEME_ID, type ThemeSlot } from "@portfolio/themes";
 import { getWidget } from "@portfolio/widgets";
@@ -66,19 +67,59 @@ export function PortfolioRenderer({ data }: PortfolioRendererProps) {
         {content}
       </div>
     );
+    // `--w-order` drives this item's position in the MOBILE (single-column) view via the
+    // `order` CSS property (see the `@container` mobile breakpoint in globals.css) — falls back
+    // to the desktop `order` until the user explicitly customizes mobile order. Desktop's own
+    // gridColumn/gridRow below is untouched; mobile visibility is a separate `data-` attribute
+    // since `mobileVisible === false` must hide a widget on mobile without removing it from the
+    // desktop grid it's still occupying here.
+    const mobileHidden = instance.mobileVisible === false;
     return [
       <div
         key={key}
         className="theme-widget-grid-item"
-        style={{ gridColumn: `${x + 1} / span ${w}`, gridRow: `${y + 1} / span ${h}` }}
+        data-mobile-hidden={mobileHidden ? "true" : undefined}
+        style={
+          {
+            gridColumn: `${x + 1} / span ${w}`,
+            gridRow: `${y + 1} / span ${h}`,
+            "--w-order": instance.mobileOrder ?? instance.order,
+          } as CSSProperties
+        }
       >
         {inner}
       </div>,
     ];
   });
 
+  // Widgets hidden on desktop (`visible: false`, so already excluded from `visibleWidgets` and
+  // `resolveGridLayout`'s bin-packing above) but explicitly shown on mobile — never consume
+  // desktop grid space; rendered as extra items, `display:none` by default, only revealed by the
+  // same mobile `@container` breakpoint (see `.theme-widget-grid-item--mobile-only` in globals.css).
+  const mobileOnlyItems = data.widgets
+    .filter((w) => !w.visible && w.mobileVisible === true)
+    .flatMap((instance) => {
+      const widget = getWidget(instance.key);
+      if (!widget) return [];
+      const WidgetComponent = widget.Component;
+      return [
+        <div
+          key={instance.key}
+          className="theme-widget-grid-item theme-widget-grid-item--mobile-only"
+          style={{ "--w-order": instance.mobileOrder ?? instance.order } as CSSProperties}
+        >
+          <div id={`portfolio-section-${instance.key}`} data-widget-key={instance.key}>
+            <ErrorBoundary fallback={null}>
+              <WidgetComponent data={data} config={instance.config} instanceKey={instance.key} />
+            </ErrorBoundary>
+          </div>
+        </div>,
+      ];
+    });
+
+  const allGridItems = [...gridItems, ...mobileOnlyItems];
   const slots: ThemeSlot[] =
-    gridItems.length === 0 ? [] : [{ key: "grid-root", node: <div className="theme-widget-grid">{gridItems}</div> }];
+    allGridItems.length === 0 ? [] : [{ key: "grid-root", node: <div className="theme-widget-grid">{allGridItems}</div> }];
 
   const ThemeComponent = theme.Component;
 

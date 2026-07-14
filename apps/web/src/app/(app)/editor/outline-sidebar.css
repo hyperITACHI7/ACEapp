@@ -36,6 +36,13 @@
   transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Visual separator between sections — omitted after the last one (nothing to divide it from
+ * below) so the sidebar doesn't end on a trailing line. */
+.outline-section:not(:last-child) {
+  padding-bottom: 0.625rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 /* The only feedback that a section is the current drag-and-drop target — deliberately just a
  * background tint + inset ring, no layout shift, so hovering it while dragging doesn't jitter
  * anything else in the list. */
@@ -48,7 +55,7 @@
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  margin-bottom: 0.375rem;
+  margin-bottom: 0.05rem;
   padding: 0 0.15rem;
 }
 
@@ -81,6 +88,33 @@
 
 .outline-section-header--ungrouped {
   opacity: 0.7;
+}
+
+/* Drag affordance for reordering whole sections — stays visible at rest (unlike the reorder/
+ * delete controls below) since it's the only way to reorder a section and needs to be
+ * discoverable, not just accessible on hover. */
+.outline-section-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.4rem;
+  border: none;
+  background: none;
+  color: var(--muted-foreground);
+  cursor: grab;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.outline-section-drag-handle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--foreground);
+}
+
+.outline-section-drag-handle:active {
+  cursor: grabbing;
 }
 
 /* Status indicator, not just an action — stays visible at rest so a hidden-from-nav section is
@@ -305,4 +339,77 @@
 .outline-card:has(.outline-card-corner:hover) .react-resizable-handle.react-resizable-handle-se,
 .outline-card:has(.react-resizable-handle-se:hover) .outline-card-corner {
   opacity: 0 !important;
+}
+
+/* Mobile Outline sidebar (MobileOutlineSidebar.tsx) — a plain vertically-sortable list per
+ * section (@dnd-kit/sortable), not the 2D react-grid-layout grid above: mobile has no
+ * position/size to edit, only order + show/hide (see the mobile @container breakpoint in
+ * globals.css, which reads this order via each widget's --w-order custom property). */
+.mobile-outline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.mobile-outline-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mobile-outline-row--disabled {
+  opacity: 0.4;
+}
+
+.mobile-outline-row-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.4rem;
+  border: none;
+  background: none;
+  color: var(--muted-foreground);
+  cursor: grab;
+  touch-action: none;
+}
+
+.mobile-outline-row-handle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--foreground);
+}
+
+.mobile-outline-row-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-outline-row-eye {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.4rem;
+  border: none;
+  background: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.mobile-outline-row-eye:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--foreground);
 }

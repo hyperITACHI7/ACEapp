@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Monitor, Smartphone } from "lucide-react";
 import type { PortfolioData } from "@portfolio/schema";
 import { Button, useToast } from "@portfolio/ui-kit";
 import { computeHealthScore } from "@/lib/healthScore";
@@ -11,9 +12,18 @@ interface PublishBarProps {
   draft: PortfolioData;
   published: boolean;
   saving: boolean;
+  editingBreakpoint: "desktop" | "mobile";
+  onEditingBreakpointChange: (breakpoint: "desktop" | "mobile") => void;
 }
 
-export function PublishBar({ portfolioId, draft, published, saving }: PublishBarProps) {
+export function PublishBar({
+  portfolioId,
+  draft,
+  published,
+  saving,
+  editingBreakpoint,
+  onEditingBreakpointChange,
+}: PublishBarProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const [publishing, setPublishing] = useState(false);
@@ -48,7 +58,37 @@ export function PublishBar({ portfolioId, draft, published, saving }: PublishBar
           />
         </div>
         <span className="text-xs text-muted-foreground shrink-0">{saving ? "Saving…" : "Saved"}</span>
-        <Button onClick={publish} disabled={publishing} size="sm" className="ml-auto shrink-0">
+        {/* Which device the preview/Outline sidebar is currently editing — desktop's grid
+           position/size vs mobile's independent order + show/hide (see MobileOutlineSidebar). */}
+        <div className="ml-auto flex items-center gap-0.5 rounded-full border border-white/10 bg-white/5 p-0.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => onEditingBreakpointChange("desktop")}
+            aria-pressed={editingBreakpoint === "desktop"}
+            title="Edit desktop layout"
+            className={`flex items-center justify-center rounded-full p-1.5 transition-colors ${
+              editingBreakpoint === "desktop"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Monitor size={14} />
+          </button>
+          <button
+            type="button"
+            onClick={() => onEditingBreakpointChange("mobile")}
+            aria-pressed={editingBreakpoint === "mobile"}
+            title="Edit mobile layout"
+            className={`flex items-center justify-center rounded-full p-1.5 transition-colors ${
+              editingBreakpoint === "mobile"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Smartphone size={14} />
+          </button>
+        </div>
+        <Button onClick={publish} disabled={publishing} size="sm" className="shrink-0">
           {publishing ? "Publishing…" : published ? "Republish" : "Publish"}
         </Button>
       </div>

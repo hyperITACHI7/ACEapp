@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type MutableRefObject, type R
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { ChevronDown, ChevronUp, Eye, EyeOff, X } from "lucide-react";
+import { Eye, EyeOff, GripVertical, X } from "lucide-react";
 import { resolveGridLayout, type NavGroup, type ResolvedGridItem, type WidgetInstance } from "@portfolio/schema";
 import { listWidgets } from "@portfolio/widgets";
 import { sectionIcon, sectionColor, sectionLabel } from "./sectionMeta";
@@ -32,7 +32,7 @@ interface OutlineSidebarProps {
   onCreateGroup: () => void;
   onRenameGroup: (groupId: string, name: string) => void;
   onToggleGroupVisible: (groupId: string) => void;
-  onReorderGroup: (groupId: string, direction: "up" | "down") => void;
+  onReorderGroup: (draggedGroupId: string, targetGroupId: string) => void;
   onDeleteGroup: (groupId: string) => void;
   onAssignGroup: (widgetKey: string, groupId: string | undefined) => void;
 }
@@ -111,6 +111,11 @@ export function OutlineSidebar({
   const sectionRefs = useRef(new Map<string, HTMLDivElement>());
   const [dragOverSectionId, setDragOverSectionId] = useState<string | null>(null);
   const [draggingActive, setDraggingActive] = useState(false);
+  // Native HTML5 drag-and-drop for reordering whole sections (grab a section's handle, drop it
+  // on another section) — distinct from `dragOverSectionId` above, which tracks widget cards
+  // being dragged between sections via react-grid-layout's mouse-position-based drag.
+  const [draggedGroupId, setDraggedGroupId] = useState<string | null>(null);
+  const [groupDropTargetId, setGroupDropTargetId] = useState<string | null>(null);
 
   const handleDraggingChange = useCallback(
     (dragging: boolean) => {
@@ -177,10 +182,43 @@ export function OutlineSidebar({
             if (el) sectionRefs.current.set(bucket.id, el);
             else sectionRefs.current.delete(bucket.id);
           }}
-          className={`outline-section${bucket.id === dragOverSectionId ? " outline-section--drop-target" : ""}`}
+          className={`outline-section${
+            bucket.id === dragOverSectionId || bucket.group?.id === groupDropTargetId ? " outline-section--drop-target" : ""
+          }`}
+          onDragOver={(e) => {
+            if (!bucket.group || !draggedGroupId || draggedGroupId === bucket.group.id) return;
+            e.preventDefault();
+            setGroupDropTargetId(bucket.group.id);
+          }}
+          onDragLeave={() => {
+            setGroupDropTargetId((id) => (id === bucket.group?.id ? null : id));
+          }}
+          onDrop={(e) => {
+            if (!bucket.group || !draggedGroupId) return;
+            e.preventDefault();
+            onReorderGroup(draggedGroupId, bucket.group.id);
+            setDraggedGroupId(null);
+            setGroupDropTargetId(null);
+          }}
         >
           {bucket.group ? (
             <div className="outline-section-header">
+              <button
+                type="button"
+                className="outline-section-drag-handle"
+                draggable
+                onDragStart={(e) => {
+                  setDraggedGroupId(bucket.group!.id);
+                  e.dataTransfer.effectAllowed = "move";
+                }}
+                onDragEnd={() => {
+                  setDraggedGroupId(null);
+                  setGroupDropTargetId(null);
+                }}
+                title="Drag to reorder this section"
+              >
+                <GripVertical size={13} />
+              </button>
               <input
                 ref={(el) => {
                   if (el) nameInputRefs.current.set(bucket.group!.id, el);
@@ -204,16 +242,6 @@ export function OutlineSidebar({
                 {bucket.group.showInNav ? <Eye size={13} /> : <EyeOff size={13} />}
               </button>
               <div className="outline-section-controls-extra">
-                <button type="button" onClick={() => onReorderGroup(bucket.group!.id, "up")} title="Move section up">
-                  <ChevronUp size={13} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onReorderGroup(bucket.group!.id, "down")}
-                  title="Move section down"
-                >
-                  <ChevronDown size={13} />
-                </button>
                 <button
                   type="button"
                   onClick={() => onDeleteGroup(bucket.group!.id)}

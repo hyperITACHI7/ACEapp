@@ -13,9 +13,19 @@ interface TopBarProps {
   published: boolean;
   saving: boolean;
   onOpenSettings: () => void;
+  editingBreakpoint: "desktop" | "mobile";
+  onEditingBreakpointChange: (breakpoint: "desktop" | "mobile") => void;
 }
 
-export function TopBar({ portfolioId, draft, published, saving, onOpenSettings }: TopBarProps) {
+export function TopBar({
+  portfolioId,
+  draft,
+  published,
+  saving,
+  onOpenSettings,
+  editingBreakpoint,
+  onEditingBreakpointChange,
+}: TopBarProps) {
   const themeName = getTheme(draft.themeId)?.manifest.name ?? "Theme";
 
   return (
@@ -28,7 +38,14 @@ export function TopBar({ portfolioId, draft, published, saving, onOpenSettings }
         All portfolios
       </Link>
       <div className="w-px h-5 bg-white/10 shrink-0" />
-      <PublishBar portfolioId={portfolioId} draft={draft} published={published} saving={saving} />
+      <PublishBar
+        portfolioId={portfolioId}
+        draft={draft}
+        published={published}
+        saving={saving}
+        editingBreakpoint={editingBreakpoint}
+        onEditingBreakpointChange={onEditingBreakpointChange}
+      />
       {/* Labeled (not icon-only) so it's obvious this is where theme switching + other
          portfolio-level settings live, rather than an unmarked gear glyph. */}
       <Button variant="secondary" size="sm" onClick={onOpenSettings} aria-label="Theme and settings" className="shrink-0">

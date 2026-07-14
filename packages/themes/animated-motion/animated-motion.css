@@ -56,8 +56,9 @@
 .theme-ambient {
   /* `absolute`, not `fixed` — this must stay confined to the theme's own box (sized to its
      full scrollable content height via the `.theme-animated-motion` positioned ancestor).
-     `fixed` would escape that box and bleed across the surrounding app chrome, since none of
-     the editor's wrapper divs establish a containing block for fixed descendants. */
+     `fixed` would escape that box and bleed across the surrounding app chrome. (`.theme` does
+     establish a containing block for `fixed` descendants via its `container-type` — see
+     CustomCursor's portal-to-body workaround below for why that one has to opt out of it.) */
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -163,7 +164,7 @@
   justify-content: space-between;
 }
 
-@media (min-width: 1024px) {
+@container (min-width: 1024px) {
   .theme-nav-inner {
     padding: 0 3rem;
   }
@@ -199,7 +200,7 @@
   transition: color 0.2s ease;
 }
 
-@media (min-width: 768px) {
+@container (min-width: 768px) {
   .theme-nav-link {
     display: block;
   }
@@ -243,6 +244,15 @@
   overflow: hidden;
 }
 
+/* Editor-only override (see the `.portfolio-canvas` height-containment block in globals.css):
+ * `100vh` is the full BROWSER viewport, far taller than the editor's actual preview frame, so
+ * this hero would eat the entire frame (and then some) regardless of how small the frame is.
+ * `100cqh` sizes it to `.theme`'s own real height instead — untouched on the public page, which
+ * has no `.portfolio-canvas` ancestor. */
+.portfolio-canvas .theme-header--animated {
+  min-height: 100cqh;
+}
+
 .theme-header-inner {
   position: relative;
   z-index: 10;
@@ -252,7 +262,7 @@
   padding: 7rem 1.5rem 4rem;
 }
 
-@media (min-width: 1024px) {
+@container (min-width: 1024px) {
   .theme-header-inner {
     padding: 7rem 3rem 4rem;
   }
@@ -272,7 +282,10 @@
 
 .theme-name--display {
   font-family: var(--font-heading, inherit);
-  font-size: clamp(4.5rem, 14vw, 12rem);
+  /* `cqw`, not `vw` — scales against `.theme`'s own rendered width (see its container-type in
+   * shared-themes.css), which in the editor preview is much narrower than the browser viewport;
+   * a `vw` value here sized this headline off-screen-large and clipped/overlapped it. */
+  font-size: clamp(4.5rem, 14cqw, 12rem);
   font-weight: 800;
   line-height: 0.88;
   letter-spacing: -0.02em;
@@ -296,7 +309,7 @@
   gap: 2.5rem;
 }
 
-@media (min-width: 768px) {
+@container (min-width: 768px) {
   .theme-hero-row {
     flex-direction: row;
     align-items: flex-end;
@@ -315,7 +328,7 @@
   margin: 0;
 }
 
-@media (min-width: 768px) {
+@container (min-width: 768px) {
   .theme-headline--animated {
     font-size: 1.5rem;
   }
@@ -386,14 +399,14 @@
   padding: 5rem 1.5rem;
 }
 
-@media (min-width: 1024px) {
+@container (min-width: 1024px) {
   .theme-slot--animated {
     padding-left: 3rem;
     padding-right: 3rem;
   }
 }
 
-@media (min-width: 640px) {
+@container (min-width: 640px) {
   .theme-slot--animated {
     padding-top: 8rem;
     padding-bottom: 8rem;
@@ -424,13 +437,13 @@
   gap: 1rem;
 }
 
-@media (min-width: 768px) {
+@container (min-width: 768px) {
   .theme-footer-inner {
     flex-direction: row;
   }
 }
 
-@media (min-width: 1024px) {
+@container (min-width: 1024px) {
   .theme-footer-inner {
     padding: 0 3rem;
   }

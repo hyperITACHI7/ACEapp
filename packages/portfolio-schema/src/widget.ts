@@ -22,6 +22,11 @@ export const WidgetInstanceSchema = z.object({
   // Absent = ungrouped, same "absence is meaningful" convention as `grid` above — a widget with
   // no groupId never appears in a theme's nav header and sorts last (see `resolveGridLayout`).
   groupId: z.string().optional(),
+  // Mobile order/visibility, independent from `order`/`visible` above — same "absence means
+  // inherit the desktop value" convention. Mobile has no separate `grid` (position/size): it
+  // always renders single-column, so only sequence and show/hide are meaningful per device.
+  mobileOrder: z.number().int().optional(),
+  mobileVisible: z.boolean().optional(),
 });
 
 export type GridPlacement = z.infer<typeof GridPlacementSchema>;
