@@ -1,0 +1,12 @@
+{
+  "key": "couture-editorial-gallery",
+  "label": "Gallery (Collections Archive)",
+  "section": "gallery",
+  "sizes": ["2x3", "2x2", "2x1"],
+  "bundledWith": "couture-editorial",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Design Work" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Collections\nArchive" },
+    { "name": "yearFilterEnabled", "label": "Show year filter", "type": "boolean", "default": true }
+  ]
+}

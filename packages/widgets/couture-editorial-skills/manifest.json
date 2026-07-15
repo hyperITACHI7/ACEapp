@@ -1,0 +1,11 @@
+{
+  "key": "couture-editorial-skills",
+  "label": "Skills (Couture Editorial)",
+  "section": "skills",
+  "sizes": ["1x2", "1x1", "2x1"],
+  "bundledWith": "couture-editorial",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Expertise" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Skills &\nDisciplines" }
+  ]
+}

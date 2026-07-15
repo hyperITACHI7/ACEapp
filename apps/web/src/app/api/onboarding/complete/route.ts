@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@portfolio/db";
 import { validatePortfolioData, emptyPortfolioData, type PortfolioData } from "@portfolio/schema";
-import { getTheme, DEFAULT_THEME_ID } from "@portfolio/themes";
+import { getTheme, DEFAULT_THEME_ID, applyBlueprint } from "@portfolio/themes";
 import { getCurrentUser } from "@/server/auth/session";
 import { userOwnsTheme } from "@/server/payments/ownership";
 
@@ -39,9 +39,18 @@ export async function POST(request: Request) {
   }
 
   const current = validatePortfolioData(portfolio.data);
-  const base: PortfolioData = current.success
+  const rawBase: PortfolioData = current.success
     ? current.data
     : emptyPortfolioData(themeId, theme.manifest.defaultPalette);
+
+  // If this is still a genuinely untouched portfolio (no widgets yet) and the chosen theme ships
+  // a blueprint, start from the blueprint's full sample content instead of a bare empty
+  // portfolio — the onboarding answers below still take priority over any blueprint sample value
+  // (see the `body.profile?.x ?? base.profile.x` chains just below).
+  const base: PortfolioData =
+    theme.blueprint && rawBase.widgets.length === 0
+      ? applyBlueprint(themeId, theme.manifest.defaultPalette, theme.blueprint)
+      : rawBase;
 
   const nextData: PortfolioData = {
     ...base,

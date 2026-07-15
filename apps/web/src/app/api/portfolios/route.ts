@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@portfolio/db";
-import { emptyPortfolioData } from "@portfolio/schema";
-import { getTheme, DEFAULT_THEME_ID } from "@portfolio/themes";
+import { validatePortfolioData } from "@portfolio/schema";
+import { getTheme, DEFAULT_THEME_ID, applyBlueprint } from "@portfolio/themes";
 import { getCurrentUser } from "@/server/auth/session";
 import { userOwnsTheme } from "@/server/payments/ownership";
 
@@ -55,14 +55,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Purchase this theme before using it." }, { status: 402 });
   }
 
-  const data = emptyPortfolioData(themeId, theme.manifest.defaultPalette);
+  // Blueprint-aware: a theme with sample content (see @portfolio/themes' TemplateBlueprint)
+  // seeds a portfolio that already looks like the theme's reference design; a theme with no
+  // blueprint falls back to today's bare-empty-portfolio behavior unchanged.
+  const data = applyBlueprint(themeId, theme.manifest.defaultPalette, theme.blueprint);
+  const validated = validatePortfolioData(data);
+  if (!validated.success) {
+    // A blueprint that fails schema validation is an authoring bug, not a user error — fail
+    // loudly rather than silently persisting data the schema itself would reject.
+    console.error(`Theme "${themeId}" blueprint failed validation:`, validated.error.issues);
+    return NextResponse.json({ error: "This theme is misconfigured. Please try another." }, { status: 500 });
+  }
 
   const portfolio = await prisma.portfolio.create({
     data: {
       userId: user.id,
       username: user.username,
       ...(name ? { name } : {}),
-      data,
+      data: validated.data,
     },
   });
 

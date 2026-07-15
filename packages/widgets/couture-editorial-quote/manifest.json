@@ -1,0 +1,11 @@
+{
+  "key": "couture-editorial-quote",
+  "label": "Quote (Testimonials)",
+  "section": "quote",
+  "sizes": ["2x1", "1x1"],
+  "bundledWith": "couture-editorial",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Voices" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "What They\nSay" }
+  ]
+}

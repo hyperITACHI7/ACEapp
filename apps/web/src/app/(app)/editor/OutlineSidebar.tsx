@@ -56,6 +56,39 @@ interface Bucket {
   placements: ResolvedGridItem[];
 }
 
+/**
+ * Resize-handle constraints for one widget: `manifest.sizes`, when present, is the authoritative
+ * source (min/max of each dimension across every footprint the widget actually has a designed
+ * rendering for) — this is what stops the resize handle from ever reaching an undesigned
+ * footprint. Heights between designed variants ARE reachable (the widget renders its nearest
+ * designed variant; rows are auto-height so intermediate `h` is organizational, not a pixel
+ * height), but never beyond the native footprint's `maxH`. `lockedWidth` remains a stronger,
+ * independent constraint (width pinned to 2 regardless of what `sizes` says, since a locked
+ * widget's internal layout can't narrow at all). Absent `sizes` falls back to the pre-`sizes`
+ * behavior: any height up to 2, width free unless locked.
+ */
+function widgetSizeConstraints(def: WidgetDef | undefined): {
+  minW: number;
+  maxW: number;
+  minH: number;
+  maxH: number;
+} {
+  const locked = def?.manifest.lockedWidth === true;
+  const sizes = def?.manifest.sizes;
+  if (sizes && sizes.length > 0) {
+    // "WxH" — split, don't index by character position: H can be two digits ("2x10").
+    const ws = sizes.map((s) => Number(s.split("x")[0]));
+    const hs = sizes.map((s) => Number(s.split("x")[1]));
+    return {
+      minW: locked ? 2 : Math.min(...ws),
+      maxW: locked ? 2 : Math.max(...ws),
+      minH: Math.min(...hs),
+      maxH: Math.max(...hs),
+    };
+  }
+  return { minW: locked ? 2 : 1, maxW: 2, minH: 1, maxH: 2 };
+}
+
 /** Finds the (other) section whose wrapper bounds currently contain a point — the mechanism
  *  behind dragging a card from one section's grid into a different one, since react-grid-layout
  *  has no native concept of dragging an item between separate grid instances. */
@@ -262,7 +295,6 @@ export function OutlineSidebar({
               placements={bucket.placements}
               widgets={widgets}
               allWidgetDefs={allWidgetDefs}
-              isLockedWidth={isLockedWidth}
               sectionId={bucket.id}
               sectionRefs={sectionRefs}
               containerRef={containerRef}
@@ -288,7 +320,6 @@ interface OutlineSectionGridProps {
   placements: ResolvedGridItem[];
   widgets: WidgetInstance[];
   allWidgetDefs: WidgetDef[];
-  isLockedWidth: (key: string) => boolean;
   sectionId: string;
   sectionRefs: MutableRefObject<Map<string, HTMLDivElement>>;
   containerRef: RefObject<HTMLDivElement | null>;
@@ -304,7 +335,6 @@ function OutlineSectionGrid({
   placements,
   widgets,
   allWidgetDefs,
-  isLockedWidth,
   sectionId,
   sectionRefs,
   containerRef,
@@ -324,17 +354,18 @@ function OutlineSectionGrid({
   const suppressNextLayoutKey = useRef<string | null>(null);
 
   const layout: RGLLayoutItem[] = placements.map((p) => {
-    const locked = isLockedWidth(p.key);
+    const def = allWidgetDefs.find((w) => w.manifest.key === p.key);
+    const { minW, maxW, minH, maxH } = widgetSizeConstraints(def);
     return {
       i: p.key,
       x: p.x,
       y: p.y - minY,
       w: p.w,
       h: p.h,
-      minW: locked ? 2 : 1,
-      maxW: 2,
-      minH: 1,
-      maxH: 2,
+      minW,
+      maxW,
+      minH,
+      maxH,
       resizeHandles: ["se"],
     };
   });
@@ -425,7 +456,7 @@ function OutlineSectionGrid({
       cols={2}
       rowHeight={52}
       margin={[8, 8]}
-      compactType="vertical"
+      compactType={null}
       preventCollision={false}
       resizeHandles={["se"]}
       onDragStart={handleDragStart}

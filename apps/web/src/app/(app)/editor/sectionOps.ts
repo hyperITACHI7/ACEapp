@@ -51,6 +51,12 @@ function clampSpan(n: number): 1 | 2 {
   return n <= 1 ? 1 : 2;
 }
 
+// Heights are open integers (a native footprint spans as many rows as its reference design is
+// tall — see GridPlacementSchema), so only floor/round; the schema's own max(12) is the ceiling.
+function clampRows(n: number): number {
+  return Math.max(1, Math.min(12, Math.round(n)));
+}
+
 /** Persists an explicit grid placement for every widget in `positions` at once — used after any
  *  drag/resize interaction in the Outline sidebar's grid, since the drag library reports the
  *  complete current layout (every item, not just the one that moved) on every change. Values
@@ -68,7 +74,7 @@ export function updateGridPositions(prev: PortfolioData, positions: GridPosition
           x: clampCol(p.x),
           y: Math.max(0, Math.round(p.y)),
           w: clampSpan(p.w),
-          h: clampSpan(p.h),
+          h: clampRows(p.h),
         },
       };
     }),

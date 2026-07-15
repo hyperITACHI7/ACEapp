@@ -1,0 +1,13 @@
+{
+  "key": "couture-editorial-about",
+  "label": "About (Couture Editorial)",
+  "section": "about",
+  "sizes": ["2x4", "2x2", "2x1"],
+  "bundledWith": "couture-editorial",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "About the Designer" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Crafting Identity\nThrough Cloth" },
+    { "name": "badge", "label": "Portrait badge text", "type": "text", "default": "MA / CSM London" },
+    { "name": "ctaLabel", "label": "CTA button label", "type": "text", "default": "Download Portfolio PDF" }
+  ]
+}

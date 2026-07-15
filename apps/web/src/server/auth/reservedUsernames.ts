@@ -1,7 +1,7 @@
 // Blocklist enforced at signup/username-change time so a username never collides with an app
 // route or reads as an official account (edge_case.md §8).
 const RESERVED_USERNAMES = new Set([
-  "admin", "api", "www", "app", "dashboard", "editor", "onboarding", "login", "signup",
+  "admin", "api", "www", "app", "dashboard", "editor", "preview", "onboarding", "login", "signup",
   "logout", "static", "assets", "help", "support", "billing", "settings", "root", "mail",
   "blog", "null", "undefined", "favicon.ico", "robots.txt", "sitemap.xml",
 ]);

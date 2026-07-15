@@ -1,0 +1,127 @@
+.widget-couture-hero {
+  position: relative;
+  /* cqw (not cqh): the width axis is the only one `.theme`'s inline-size containment provides on
+   * both surfaces — cqh silently falls back to viewport units on the public page, breaking
+   * WYSIWYG. Never use negative margins to fake full-bleed: the widget grid has no padding to
+   * offset, so they just bleed into the adjacent grid rows. */
+  min-height: clamp(24rem, 44cqw, 42rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-size: cover;
+  background-position: center;
+  padding: 5rem 1.5rem;
+}
+
+.widget-couture-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 8, 6, 0.55) 0%, rgba(8, 8, 6, 0.75) 60%, rgba(8, 8, 6, 0.95) 100%);
+}
+
+.widget-couture-hero-bg-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 3;
+  bottom: auto;
+}
+
+.widget-couture-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 44rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.widget-couture-hero-eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-2, var(--accent));
+  margin-bottom: 1.5rem;
+}
+
+.widget-couture-hero-name {
+  font-family: var(--font-heading, inherit);
+  font-size: clamp(2.5rem, 8cqw, 5rem);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--fg);
+  margin: 0 0 1.25rem;
+}
+
+.widget-couture-hero-tagline {
+  font-family: var(--font-editorial, var(--font-heading, inherit));
+  font-style: italic;
+  font-size: clamp(1rem, 2.2cqw, 1.25rem);
+  color: var(--muted);
+  max-width: 32rem;
+  margin: 0 0 2.5rem;
+}
+
+.widget-couture-hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.widget-couture-hero-cta-primary,
+.widget-couture-hero-cta-secondary {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.9rem 1.75rem;
+  text-decoration: none;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+.widget-couture-hero-cta-primary {
+  background: var(--accent);
+  color: #080806;
+}
+.widget-couture-hero-cta-primary:hover {
+  opacity: 0.85;
+}
+.widget-couture-hero-cta-secondary {
+  border: 1px solid var(--border);
+  color: var(--fg);
+}
+.widget-couture-hero-cta-secondary:hover {
+  border-color: var(--accent);
+}
+
+.widget-couture-hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  width: 100%;
+}
+
+.widget-couture-hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.widget-couture-hero-stat-value {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+
+.widget-couture-hero-stat-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}

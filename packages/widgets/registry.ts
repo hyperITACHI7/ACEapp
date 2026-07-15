@@ -19,6 +19,16 @@ import awardsAnimated from "./awards-animated";
 import skillsMarquee from "./skills-marquee";
 import contactAnimated from "./contact-animated";
 import divider from "./divider";
+import coutureEditorialAbout from "./couture-editorial-about";
+import coutureEditorialGallery from "./couture-editorial-gallery";
+import coutureEditorialExperienceTimeline from "./couture-editorial-experience-timeline";
+import coutureEditorialContact from "./couture-editorial-contact";
+import coutureEditorialAwards from "./couture-editorial-awards";
+import coutureEditorialSkills from "./couture-editorial-skills";
+import coutureEditorialQuote from "./couture-editorial-quote";
+import coutureEditorialHero from "./couture-editorial-hero";
+import coutureEditorialMoodBoard from "./couture-editorial-mood-board";
+import coutureEditorialBanner from "./couture-editorial-banner";
 
 const registry = new Map<string, WidgetModule>();
 
@@ -51,6 +61,16 @@ register(awardsAnimated);
 register(skillsMarquee);
 register(contactAnimated);
 register(divider);
+register(coutureEditorialAbout);
+register(coutureEditorialGallery);
+register(coutureEditorialExperienceTimeline);
+register(coutureEditorialContact);
+register(coutureEditorialAwards);
+register(coutureEditorialSkills);
+register(coutureEditorialQuote);
+register(coutureEditorialHero);
+register(coutureEditorialMoodBoard);
+register(coutureEditorialBanner);
 
 /**
  * Returns undefined on an unknown/removed key. Callers decide the fallback: the editor shows

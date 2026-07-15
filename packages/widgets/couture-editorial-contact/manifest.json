@@ -1,0 +1,14 @@
+{
+  "key": "couture-editorial-contact",
+  "label": "Contact (Couture Editorial)",
+  "section": "contact",
+  "sizes": ["2x1", "1x1"],
+  "bundledWith": "couture-editorial",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Get in Touch" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Collaborate.\nCommission. Connect." },
+    { "name": "copy", "label": "Body copy", "type": "text", "default": "Available for bespoke commissions, editorial collaborations, and brand consulting." },
+    { "name": "studio", "label": "Studio address", "type": "text", "default": "Shoreditch, London E1" },
+    { "name": "stockists", "label": "Stockists", "type": "text", "default": "Dover Street Market — London · Tokyo · New York" }
+  ]
+}

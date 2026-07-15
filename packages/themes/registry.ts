@@ -5,6 +5,7 @@ import architectShowcase from "./architect-showcase";
 import writerEditorial from "./writer-editorial";
 import multiDomainCards from "./multi-domain-cards";
 import animatedMotion from "./animated-motion";
+import coutureEditorial from "./couture-editorial";
 
 const registry = new Map<string, ThemeModule>();
 
@@ -25,6 +26,7 @@ register(architectShowcase);
 register(writerEditorial);
 register(multiDomainCards);
 register(animatedMotion);
+register(coutureEditorial);
 
 export const DEFAULT_THEME_ID = "developer-minimal";
 
@@ -36,4 +38,5 @@ export function listThemes(): ThemeModule[] {
   return [...registry.values()];
 }
 
-export type { ThemeManifest, ThemeModule, ThemeProps, ThemeSlot } from "./types";
+export type { ThemeManifest, ThemeModule, ThemeProps, ThemeSlot, TemplateBlueprint } from "./types";
+export { applyBlueprint } from "./blueprint";

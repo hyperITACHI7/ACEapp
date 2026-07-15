@@ -1,0 +1,54 @@
+.widget-couture-contact-copy {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--muted);
+  margin: 0 0 2rem;
+  max-width: 40em;
+}
+
+.widget-couture-contact-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 2rem;
+}
+
+.widget-couture-contact-row {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: var(--fg);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.6rem;
+}
+
+.widget-couture-contact-label {
+  min-width: 6rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.widget-couture-contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.widget-couture-contact-link,
+.widget-couture-contact-link-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.9rem;
+}
+.widget-couture-contact-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

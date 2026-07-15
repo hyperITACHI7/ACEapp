@@ -1,0 +1,71 @@
+.widget-couture-quote-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+}
+
+.widget-couture-quote-card {
+  border: 1px solid var(--border);
+  padding: 2rem;
+  margin: 0;
+  position: relative;
+}
+
+.widget-couture-quote-mark {
+  font-family: Georgia, serif;
+  font-size: 3rem;
+  color: var(--accent);
+  opacity: 0.5;
+  line-height: 1;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.widget-couture-quote-text {
+  font-family: var(--font-editorial, var(--font-heading, inherit));
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--fg);
+  margin: 0 0 1.5rem;
+}
+
+.widget-couture-quote-attribution {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.widget-couture-quote-avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--card, #111009);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading, inherit);
+  font-size: 0.75rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.widget-couture-quote-name {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--fg);
+}
+
+.widget-couture-quote-role {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.widget-couture-quote-add {
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

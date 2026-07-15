@@ -1,0 +1,127 @@
+.widget-couture-timeline-head {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.widget-couture-timeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+/* Center vertical line — only meaningful once the layout is wide enough for the alternating
+ * left/right pattern (see the container query below); on narrow containers everything stacks
+ * in a single column and the line moves to sit just left of the cards instead. */
+.widget-couture-timeline-list::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0.5rem;
+  width: 1px;
+  background: var(--border);
+}
+@container (min-width: 640px) {
+  .widget-couture-timeline-list::before {
+    left: 50%;
+  }
+}
+
+.widget-couture-timeline-entry {
+  position: relative;
+  padding-left: 2rem;
+  padding-bottom: 3rem;
+}
+@container (min-width: 640px) {
+  .widget-couture-timeline-entry {
+    width: 50%;
+    padding-left: 0;
+    padding-right: 3rem;
+    text-align: right;
+  }
+  .widget-couture-timeline-entry--right {
+    margin-left: 50%;
+    padding-right: 0;
+    padding-left: 3rem;
+    text-align: left;
+  }
+}
+
+.widget-couture-timeline-dot {
+  position: absolute;
+  top: 0.3rem;
+  left: 0.5rem;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 4px rgba(196, 165, 96, 0.15);
+}
+@container (min-width: 640px) {
+  .widget-couture-timeline-entry {
+    --dot-side: 100%;
+  }
+  .widget-couture-timeline-entry .widget-couture-timeline-dot {
+    left: auto;
+    right: -4.5px;
+    transform: none;
+  }
+  .widget-couture-timeline-entry--right .widget-couture-timeline-dot {
+    right: auto;
+    left: -4.5px;
+  }
+}
+
+.widget-couture-timeline-year {
+  display: block;
+  font-family: var(--font-heading, inherit);
+  color: var(--accent);
+  font-size: 1.1rem;
+  margin-bottom: 0.35rem;
+}
+
+.widget-couture-timeline-title {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--fg);
+  margin: 0 0 0.5rem;
+}
+
+.widget-couture-timeline-detail {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* --tight (h=2): same alternating layout, compressed vertical rhythm. */
+.widget-couture-timeline--tight .widget-couture-timeline-head {
+  margin-bottom: 2rem;
+}
+.widget-couture-timeline--tight .widget-couture-timeline-entry {
+  padding-bottom: 1.75rem;
+}
+
+/* --compact (h=1, set by the component's footprint lookup): plain single-column list — overrides
+ * the @container alternating rules above regardless of portfolio width (declared later at equal
+ * or higher specificity, so it wins). */
+.widget-couture-timeline--compact .widget-couture-timeline-head {
+  margin-bottom: 1.5rem;
+}
+.widget-couture-timeline--compact .widget-couture-timeline-list::before {
+  left: 0.5rem;
+}
+.widget-couture-timeline--compact .widget-couture-timeline-entry,
+.widget-couture-timeline--compact .widget-couture-timeline-entry--right {
+  width: 100%;
+  margin-left: 0;
+  padding: 0 0 1.5rem 2rem;
+  text-align: left;
+}
+.widget-couture-timeline--compact .widget-couture-timeline-dot {
+  left: 0.5rem;
+  right: auto;
+  transform: translateX(-50%);
+}

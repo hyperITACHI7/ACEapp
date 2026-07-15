@@ -84,8 +84,17 @@ produces a template that breaks in ways you won't see until runtime.
    (flex shrink-then-wrap with documented `min-width`/`minmax(0,1fr)` reasoning) and
    `packages/widgets/gallery-animated/gallery-animated.css` (`auto-fit` grid).
 
-8. **The 2-column grid is fixed.** Widget footprints are exactly `w×h` with `w ∈ {1,2}`,
-   `h ∈ {1,2}` — four possible sizes: 1x1, 1x2, 2x1, 2x2. Do not invent finer grids.
+8. **The 2-column grid is fixed; heights are open integers.** Widget footprints are `w×h` with
+   `w ∈ {1,2}` and `h` an integer row count (schema caps at 12). One grid row ≈ **330px of
+   rendered desktop height** — this is a *proportion convention*, not a pixel constraint: the
+   renderer's rows are `grid-auto-rows: auto` (always sized to content), so `h` drives the
+   Outline sidebar's card proportions and row-sharing granularity, never a hard height.
+   Rules: a widget's **native footprint** (the one reproducing the reference) gets
+   `h = round(measured natural height / 330)` and may be as tall as the reference needs; every
+   **alternate variant stays within 2x2** (the registry validator enforces "at most one entry
+   taller than 2 rows"). Never leave a visually large section at `h: 1` — a 1300px About at
+   `h: 1` renders fine but shows as a tiny sidebar card identical to a 400px Contact, which
+   reads as a bug to users. Do not invent finer grids (no 3+ columns, no fractional units).
 
 ---
 
@@ -118,8 +127,8 @@ export interface TemplateBlueprint {
     order: number;
     visible: boolean;
     config: Record<string, unknown>;
-    grid?: { x: 0 | 1; y: number; w: 1 | 2; h: 1 | 2 };
-    groupId?: string;
+    grid?: { x: 0 | 1; y: number; w: 1 | 2; h: number }; // h = integer row count, see invariant 8
+    groupId: string; // REQUIRED in blueprints — see Phase 6 (ungrouped widgets break the sidebar)
   }>;
   navGroups: Array<{ id: string; name: string; order: number; showInNav: boolean }>;
   profile?: Partial<ProfileShape>; // sample name/headline/bio/photoUrl/location/socialLinks
@@ -180,21 +189,26 @@ Generalizes the existing `lockedWidth: true` flag (used by `about-animated`, `sk
 - Add to `WidgetManifest`:
 
 ```ts
-/** Which grid footprints this widget has a designed rendering for. The editor's resize handle
- *  is constrained so the widget can never be dragged to an unsupported footprint. Absent =
- *  all four footprints allowed (legacy behavior). `lockedWidth: true` remains supported and
- *  means "w is always 2" (equivalent to sizes ⊆ {2x1, 2x2}). */
-sizes?: Array<"1x1" | "1x2" | "2x1" | "2x2">;
+/** Which grid footprints this widget has a designed rendering for, as "WxH" strings — W ∈ {1,2},
+ *  H an integer 1..12 (one row ≈ 330px rendered desktop height, see invariant 8). List the
+ *  NATIVE footprint (the reference's own proportions) first; at most that one entry may have
+ *  H > 2 — alternates stay within 2x2. The editor's resize handle is constrained to the min/max
+ *  of each dimension across entries, so intermediate heights between designed variants are
+ *  reachable (they render the nearest designed variant — harmless, rows are auto-height) but
+ *  nothing beyond the native footprint is. Absent = all of 1x1/1x2/2x1/2x2 (legacy).
+ *  `lockedWidth: true` remains supported and means "w is always 2". */
+sizes?: Array<`${1 | 2}x${number}`>;
 ```
 
-- In `OutlineSidebar.tsx`, where the RGL layout items currently derive
-  `minW/maxW/minH/maxH` from `lockedWidth`, derive them from `sizes` when present:
-  `minW = min w across sizes`, `maxW = max w`, same for h. (This is a bounding-box
-  approximation — an L-shaped sizes set like `{1x1, 2x2}` would technically permit 1x2 via the
-  handle; accept this and note it, or filter in `onLayoutChange` if it matters for a specific
-  widget.)
-- Update `packages/widgets/scripts/validateRegistry.ts` to assert `sizes`, when present, is a
-  non-empty subset of the four legal values.
+- In `OutlineSidebar.tsx`, `widgetSizeConstraints` derives `minW/maxW/minH/maxH` from `sizes`.
+  **Parse with `s.split("x")`, never by character index** — `Number(s[2])` reads `"2x10"` as
+  height 1 (this was a real bug). The min/max bounding box means an L-shaped set like
+  `{1x1, 2x2}` technically permits 1x2 via the handle; accept and note it.
+- `packages/widgets/scripts/validateRegistry.ts` asserts: `sizes`, when present, is non-empty,
+  every entry matches `/^[12]x(1[0-2]|[1-9])$/`, and **at most one entry has H > 2**.
+- `updateGridPositions` in `apps/web/src/app/(app)/editor/sectionOps.ts` must NOT clamp `h` to 2
+  (`clampSpan` is for `w` only) — a silent clamp there destroys tall native placements on the
+  first sidebar drag.
 
 ### 0.4 `hero` and `cursor-effect` sections
 
@@ -309,13 +323,18 @@ data source (schema fields / config fields) → which theme-shell parts absorb t
 
 For each widget, decide its supported footprints and design each one **before** writing code.
 
-1. **Default footprint** = the one whose proportions match the reference. A full-width hero is
-   `2x1` (or `2x2` if it's viewport-filling); a half-column stat block is `1x1`. This value goes
-   into the blueprint's `grid.w/h` — that is the entire "default" mechanism. No UI labeling.
+1. **Measure, then derive the native footprint.** With the reference running (Phase 1), measure
+   each section's rendered height at ~1440px viewport (`getBoundingClientRect()` via the
+   Playwright page — script it once for all sections). The native footprint is
+   `w = 2` (or 1 for genuinely half-column sections) and `h = round(height / 330)`, min 1.
+   A 660px hero → `2x2`; a 1320px about → `2x4`; a 430px contact → `2x1`. This value goes into
+   the blueprint's `grid.w/h` AND is listed first in `sizes` — that is the entire "default"
+   mechanism. No UI labeling. Do NOT flatten everything to `h: 1` (invariant 8: the sidebar's
+   card proportions come from `h`).
 
-2. **For each of the other three footprints, make an explicit keep/drop decision.** A footprint
-   is supported only if a *good* design exists for it — not a squashed version of the big one.
-   Heuristics for deriving smaller variants:
+2. **For each alternate footprint (all within 2x2 — see invariant 8), make an explicit
+   keep/drop decision.** A footprint is supported only if a *good* design exists for it — not a
+   squashed version of the big one. Heuristics for deriving smaller variants:
    - Reduce item counts: 4 cards → 2 → 1 (see `sizeConfig` in
      `packages/widgets/gallery-animated/GalleryAnimatedComponent.tsx`: 2x2 → 4 slots+scroll,
      2x1 → 2 slots, 1x2 → 2 slots stacked+scroll, 1x1 → 1 slot).
@@ -328,20 +347,45 @@ For each widget, decide its supported footprints and design each one **before** 
    - A cursor-effect widget renders nothing in-flow: give it `sizes: ["1x1"]` and a minimal
      in-editor placeholder card appearance (its sidebar card is how the user toggles/removes it).
 
-3. **Implementation pattern** (copy from `gallery-animated`): the component finds its own
-   current footprint at render time —
+3. **Implementation pattern — every declared size MUST have an implemented variant.** This is a
+   hard rule: a `sizes` entry with no corresponding rendering/CSS behind it produces the classic
+   "resize → text overlaps / crams" bug, because the full-width design just gets squeezed. The
+   component finds its own current footprint at render time (copy from `gallery-animated`):
 
 ```ts
 const grid = resolveGridLayout(data.widgets.filter(w => w.visible), data.navGroups ?? [])
   .find(g => g.key === instanceKey);
-const variant = sizeConfig(grid?.w ?? 2, grid?.h ?? 1);
+const variant = sizeConfig(grid?.w ?? 2, grid?.h ?? 1); // defaults = the native footprint
 ```
 
-   — then renders variant-specific structure/classes. Variant differences that are purely
-   presentational can instead be CSS via a modifier class
-   (`widget-x--narrow` set when `w === 1`, the `gallery-animated-grid--narrow` precedent).
+   — then renders variant-specific structure and/or sets modifier classes
+   (`widget-x--narrow` when `w === 1`, `widget-x--compact` when `h === 1`, the
+   `gallery-animated-grid--narrow` precedent). Since heights between designed variants are
+   reachable via the resize handle, write thresholds as ranges (`h >= 3` full, `h === 2` mid,
+   `h === 1` compact), never exact-match ladders. When a variant caps item counts, cap ONLY on
+   the public page (`!editing`) so content never becomes unreachable in the editor.
    There is no `grid` prop on `WidgetProps` (`data`, `config`, `instanceKey` only) — this
    lookup IS the mechanism.
+
+   **`@container` queries CANNOT drive footprint variants.** The container root is `.theme`
+   (the whole portfolio's width), so a half-width widget still matches wide breakpoints — an
+   `@container (min-width: 640px)` side-by-side rule crams into a 1-column cell. Use
+   `@container` ONLY for whole-portfolio narrowness (the mobile fallback); use the JS lookup
+   for anything that depends on the widget's own `w`/`h`.
+
+   **Layout-safety rules for widget CSS** (each of these caused a real overlap bug):
+   - No fixed `height`/`min-height` on containers whose content can exceed them, and no
+     `position: absolute` on text content — an absolutely-positioned block doesn't grow its
+     box, so overflowing text bleeds straight into the next grid row.
+   - Never use negative margins on the widget root to fake full-bleed: the widget grid has no
+     padding to offset, so they bleed into the adjacent rows. The grid is already edge-to-edge.
+   - Never `cqh`/`min-height: Ncqh`: `.theme` is an inline-size container, so `cqh` falls back
+     to viewport units on the public page but resolves against `.portfolio-canvas` in the
+     editor — the two surfaces render different heights (WYSIWYG breach). Use `cqw`/`rem`
+     clamps instead.
+   - Internal multi-column grids: `repeat(auto-fit, minmax(Npx, 1fr))`, never a hardcoded
+     column count; unconditional `grid-column: span 2` on children forces a phantom column
+     into single-column layouts (guard spans behind an `@container (min-width: ...)`).
 
 4. Record per widget in your notes: `sizes`, default footprint, and one line per variant
    describing what changes. This table goes into the widget folder as a comment block in the
@@ -402,16 +446,24 @@ For each widget from the Phase 2 table:
 
 `packages/themes/<theme-id>/blueprint.ts`, exported via the theme's `index.tsx` default export.
 
-1. `navGroups`: one per nav link in the reference, `name` matching the reference's nav labels,
-   sequential `order`, `showInNav: true`.
+1. `navGroups`: one per nav link in the reference (`name` matching the reference's nav labels,
+   `showInNav: true`), PLUS hidden **structural groups** (`showInNav: false`, e.g. "Intro",
+   "Spotlight") for every widget the nav doesn't link to. Sequential `order` matching visual
+   top-to-bottom order.
 2. `widgets`: one entry per extracted widget, in reference top-to-bottom order:
    - `key`, sequential `order`, `visible: true`
-   - `groupId` linking it to its nav group (a widget with no nav presence gets none)
+   - **`groupId` on EVERY widget — no ungrouped widgets in a blueprint.** The Outline sidebar
+     renders one mini-grid per group; an ungrouped widget whose stored rows interleave with
+     grouped ones makes the "Ungrouped" bucket display phantom empty rows where the other
+     groups' widgets live. Corollary: **widgets that share a grid row must share a group**
+     (e.g. Awards ∥ Skills side by side), or the sidebar can't display the pairing at all.
    - **`grid`: the exact placement reproducing the reference** — `y` counts rows from 0 in the
-     shared 2-column space; two half-width widgets side by side share a `y` with `x: 0` and
-     `x: 1`. Sketch the whole grid on paper first; `resolveGridLayout` resolves stored
-     placements verbatim (only gap-filling is automatic), so what you write is what renders —
-     in the preview AND as the sidebar card sizes/positions.
+     shared 2-column space, `h` is the Phase-3 measured native height in rows, and each next
+     widget's `y` = previous `y + h` (multi-row spans consume rows — hero `y:0 h:2` puts about
+     at `y:2`). Two half-width widgets side by side share a `y` with `x: 0` and `x: 1`. Sketch
+     the whole grid (with spans) on paper first; `resolveGridLayout` resolves stored placements
+     verbatim (only gap-filling is automatic), so what you write is what renders — in the
+     preview AND as the sidebar card sizes/positions.
    - `config`: the reference's actual text/numbers for every configSchema field.
 3. `profile` / `projects` / `experience` / `skills`: the reference's sample content mapped into
    the schema shapes (`packages/portfolio-schema/src/{profile,project,experience}.ts`). Images
@@ -433,15 +485,27 @@ sessions: sign up a throwaway user via `/signup`, `POST /api/portfolios` with
    side-by-side with the Phase 1 reference screenshots. Same sections, same order, same
    proportions, same sample content. Not byte-identical — "a user would say it's the same
    design".
-2. **Sidebar mirror**: assert each Outline sidebar card sits in the section/position/footprint
-   the blueprint specifies (a 1x1 blueprint widget shows as a half-width, single-row card at
-   its exact x/y).
-3. **Variants**: for each multi-size widget, drag its resize corner through every supported
-   footprint; screenshot each; confirm each matches its Phase 3 design and that unsupported
-   footprints are unreachable.
-4. **Mobile frame**: toggle the editor's Desktop/Mobile switch; confirm single-column sanity.
+2. **Sidebar mirror + proportions**: assert each Outline sidebar card sits in the
+   section/position/footprint the blueprint specifies, that card heights are proportional to
+   the blueprint's `h` values (a `2x4` About card must be visibly taller than a `2x1` Contact
+   card), that NO section shows phantom empty rows (each section's grid height ≈ its cards),
+   and that the "Ungrouped" bucket is empty.
+3. **Variants — mandatory, every footprint** (this catches the resize-overlap class of bug):
+   for each widget, render every supported footprint and screenshot it. Scriptable approach:
+   GET the portfolio, rewrite that widget's `grid` to the target footprint (moved to a clean
+   bottom row so nothing collides), PATCH with `expectedVersion`, reload the editor — this
+   exercises the exact `resolveGridLayout` lookup the widget uses. On every screenshot ALSO run
+   a **bounding-rect overlap assertion**: no two `.theme-widget-grid-item`s may intersect by
+   more than ~2px in both axes, and no item's first child (the widget itself) may extend
+   outside its grid item's rect (catches negative-margin/absolute-position bleed). Confirm
+   unsupported footprints are unreachable via the resize handle.
+4. **Mobile frame**: toggle the editor's Desktop/Mobile switch; confirm single-column sanity
+   and `document.documentElement.scrollWidth <= clientWidth` (no horizontal overflow) at
+   ~390px.
 5. **Publish**: publish and load `/{username}` at wide and ~390px viewports; confirm both look
-   right and match the preview (WYSIWYG check).
+   right and match the preview (WYSIWYG check), re-running the overlap assertion from step 3.
+   When inspecting via SQL, note the DB row has `data` (draft, what the editor shows) AND
+   `publishedData` (the snapshot the public page renders) — check/update the right one.
 6. **Cursor widget** (if any): on the public page, move the mouse and confirm the effect tracks
    the real pointer with zero offset while scrolled to top AND scrolled mid-page (this is the
    containing-block regression test), and that its DOM node's parent is `document.body`.
@@ -474,3 +538,24 @@ sessions: sign up a throwaway user via `/signup`, `POST /api/portfolios` with
   they are silently ignored.
 - **Widget `index.tsx` must stay server-safe** — a stray `"use client"` there breaks the
   registry from Server Components with a confusing error far from the cause.
+- **Negative margins on a widget root bleed into adjacent grid rows.** The widget grid has no
+  padding, so `margin: -1.5rem` doesn't reveal hidden gutter — it paints the widget on top of
+  its neighbors. (There are also no `--spacing-*` CSS variables in this codebase; a
+  `var(--spacing-md, 1.5rem)` fallback silently always used the fallback.)
+- **`cqh` renders differently in the editor vs the public page.** `.theme` is an inline-size
+  container (width axis only); `cqh` resolves against the editor-only `.portfolio-canvas`
+  (`container-type: size`) in the editor but falls back to viewport units publicly. Only `cqw`
+  and `rem` are WYSIWYG-safe for size clamps.
+- **react-grid-layout `compactType` must stay `null` in the Outline sidebar.** RGL's vertical
+  auto-compaction "fixes" any layout with row gaps on mount and fires `onLayoutChange`, which
+  autosaves the rewritten positions — it silently corrupted stored blueprint placements before
+  being disabled. `resolveGridLayout` is the single source of truth for placement.
+- **Size strings parse by `split("x")`, never character index** — `Number(s[2])` reads `"2x10"`
+  as height 1.
+- **Two seeding sites** consume the blueprint (`POST /api/portfolios` and
+  `/api/onboarding/complete`) and the public page renders `publishedData`, not `data` — verify
+  all three when debugging "my blueprint change isn't showing".
+- **Kill stale `.next` cache after workspace-package changes** (`rm -rf apps/web/.next` +
+  restart dev server): the dev server can keep serving an old compiled copy of
+  `packages/*` code — seeded data reflecting an old blueprint while `tsx` scripts show the new
+  one is the signature of this.

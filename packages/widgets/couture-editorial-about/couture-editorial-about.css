@@ -1,0 +1,157 @@
+/* Flexbox grow-from-minimum (see about-animated.css for the full rationale): basis == each
+ * column's floor, flex-grow fills the rest, so the row only wraps once both minimums genuinely
+ * don't fit — not at some arbitrary earlier breakpoint. */
+.widget-couture-about-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+  align-items: flex-start;
+}
+
+.widget-couture-about-portrait-wrap {
+  position: relative;
+  flex: 2 1 200px;
+  max-width: 340px;
+  min-width: 200px;
+}
+
+.widget-couture-about-portrait {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(15%) contrast(1.05);
+}
+.widget-couture-about-portrait--placeholder {
+  background: var(--card, #111009);
+  border: 1px solid var(--border);
+}
+
+.widget-couture-about-badge {
+  position: absolute;
+  bottom: -1rem;
+  right: -0.75rem;
+  background: var(--accent-2, var(--accent));
+  color: #080806;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.6rem 1rem;
+  /* nowrap for the label look, but never wider than the portrait it overlays. */
+  white-space: nowrap;
+  max-width: calc(100% + 0.75rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.widget-couture-about-text {
+  flex: 3 1 260px;
+  min-width: 0;
+}
+
+.widget-couture-about-bio {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--muted);
+  margin: 0 0 2rem;
+}
+
+.widget-couture-about-info-grid {
+  display: grid;
+  /* auto-fit, not a hardcoded 2 columns: collapses to a single column when the text column
+   * narrows instead of cramping two columns side by side. */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.25rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.widget-couture-about-info-item {
+  position: relative;
+  border-top: 1px solid var(--border);
+  padding-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.widget-couture-about-info-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.widget-couture-about-info-value {
+  font-family: var(--font-heading, inherit);
+  font-size: 1rem;
+  color: var(--fg);
+}
+
+.widget-couture-about-cta {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 0.25rem;
+  text-decoration: none;
+}
+
+/* Process steps (folded-in "Atelier & Craft") */
+.widget-couture-about-process {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2.5rem;
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--border);
+}
+
+.widget-couture-about-process-step {
+  display: flex;
+  flex-direction: column;
+}
+
+.widget-couture-about-process-image-wrap {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.widget-couture-about-process-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(15%);
+}
+.widget-couture-about-process-image--placeholder {
+  background: var(--card, #111009);
+  border: 1px solid var(--border);
+}
+
+.widget-couture-about-process-index {
+  font-family: var(--font-heading, inherit);
+  color: var(--accent);
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.widget-couture-about-process-title {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--fg);
+  margin: 0 0 0.5rem;
+}
+
+.widget-couture-about-process-desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+}

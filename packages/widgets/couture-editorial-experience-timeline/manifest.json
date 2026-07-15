@@ -1,0 +1,11 @@
+{
+  "key": "couture-editorial-experience-timeline",
+  "label": "Work Experience (Journey Timeline)",
+  "section": "experience-timeline",
+  "sizes": ["2x3", "2x2", "2x1"],
+  "bundledWith": "couture-editorial",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Career Path" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "The\nJourney" }
+  ]
+}

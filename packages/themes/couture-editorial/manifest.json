@@ -1,0 +1,21 @@
+{
+  "id": "couture-editorial",
+  "name": "Couture Editorial",
+  "domainTags": ["fashion", "design", "creative", "portfolio", "editorial"],
+  "defaultWidgetKeys": {
+    "hero": "couture-editorial-hero",
+    "about": "couture-editorial-about",
+    "gallery": "couture-editorial-gallery",
+    "mood-board": "couture-editorial-mood-board",
+    "awards": "couture-editorial-awards",
+    "experience-timeline": "couture-editorial-experience-timeline",
+    "skills": "couture-editorial-skills",
+    "quote": "couture-editorial-quote",
+    "banner": "couture-editorial-banner",
+    "contact": "couture-editorial-contact"
+  },
+  "palettes": ["default"],
+  "defaultPalette": "default",
+  "isPremium": true,
+  "priceInPaise": 5000
+}

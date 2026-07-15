@@ -1,0 +1,15 @@
+{
+  "key": "couture-editorial-banner",
+  "label": "Banner (Feature Announcement)",
+  "section": "banner",
+  "lockedWidth": true,
+  "sizes": ["2x1"],
+  "bundledWith": "couture-editorial",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Latest Show" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "London Fashion Week\nGraduate Showcase" },
+    { "name": "copy", "label": "Body copy", "type": "text", "default": "Autumn/Winter 2023. 24 looks. Standing ovation." },
+    { "name": "ctaLabel", "label": "CTA button label", "type": "text", "default": "See Full Collection" },
+    { "name": "backgroundImage", "label": "Background image URL", "type": "text", "default": "/templates/couture-editorial/banner-bg.jpg" }
+  ]
+}

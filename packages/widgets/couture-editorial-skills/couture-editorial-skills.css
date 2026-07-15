@@ -1,0 +1,73 @@
+.widget-couture-skills-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+/* --wide comes from the component's footprint lookup (w === 2), NOT an @container query — a
+ * container query here would match the whole portfolio's width, wrongly forcing the side-by-side
+ * layout into a half-width (1-column) cell. */
+.widget-couture-skills--wide .widget-couture-skills-grid {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 3rem;
+}
+.widget-couture-skills--wide .widget-couture-skills-pills,
+.widget-couture-skills--wide .widget-couture-skills-bars {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.widget-couture-skills-pills {
+  align-content: flex-start;
+}
+
+.widget-couture-skill-tag {
+  border-color: var(--border);
+  color: var(--muted);
+}
+.widget-couture-skill-tag::after {
+  background: var(--accent);
+}
+
+.widget-couture-skills-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.widget-couture-skills-bar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.widget-couture-skills-bar-label {
+  font-size: 0.85rem;
+  color: var(--fg);
+}
+
+.widget-couture-skills-bar-percent {
+  font-family: var(--font-heading, inherit);
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+.widget-couture-skills-bar-track {
+  height: 2px;
+  background: var(--border);
+  position: relative;
+}
+
+.widget-couture-skills-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2, var(--accent)));
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.widget-couture-skills-bar-slider {
+  width: 100%;
+  margin-top: 0.4rem;
+  accent-color: var(--accent);
+}

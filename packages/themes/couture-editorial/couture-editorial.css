@@ -1,0 +1,144 @@
+/* Couture Editorial — theme shell. Extracted from a fashion-portfolio Figma Make reference:
+ * near-black canvas, cream type, a single gold accent, Playfair Display headings, Raleway body,
+ * EB Garamond italic for the editorial "voice" (hero tagline / testimonial quotes). All
+ * size-based rules are @container (against .theme's own inline-size), never @media — see
+ * invariant 5 in the extract-portfolio skill. */
+
+.theme-couture-editorial {
+  font-family: var(--font-body);
+  position: relative;
+}
+
+/* Subtle grain overlay — the reference's only ambient effect (no orbs/gradients like
+ * animated-motion). A static noise texture at very low opacity reads as "premium paper", not
+ * decoration. Positioned absolute within the theme root per invariant 6 (never fixed — .theme's
+ * container-query containment would break a fixed element's positioning anyway). */
+.theme-grain {
+  overflow: hidden;
+}
+.theme-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Nav */
+.theme-nav-couture {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  backdrop-filter: none;
+  transition: background 0.5s ease, border-color 0.5s ease, backdrop-filter 0.5s ease;
+}
+.theme-nav-couture--scrolled {
+  background: rgba(8, 8, 6, 0.96);
+  border-bottom-color: var(--border);
+  backdrop-filter: blur(12px);
+}
+.theme-nav-couture-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+@container (min-width: 640px) {
+  .theme-nav-couture-inner {
+    padding: 1.25rem 2rem;
+  }
+}
+.theme-nav-couture-logo {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  text-decoration: none;
+}
+.theme-nav-couture-links {
+  list-style: none;
+  display: none;
+  gap: 1.75rem;
+  margin: 0;
+  padding: 0;
+}
+@container (min-width: 640px) {
+  .theme-nav-couture-links {
+    display: flex;
+  }
+}
+.theme-nav-couture-links a {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.theme-nav-couture-links a:hover {
+  color: var(--accent);
+}
+
+/* Fallback header (dormant once a hero widget is present, see CoutureEditorialComponent.tsx) */
+.theme-header-couture {
+  padding: 4rem 1.5rem 2rem;
+  text-align: center;
+}
+.theme-name-couture {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 6cqw, 3.5rem);
+  color: var(--fg);
+  margin: 0 0 0.5rem;
+}
+.theme-headline-couture {
+  color: var(--accent);
+  margin: 0;
+}
+
+.theme-body-couture {
+  position: relative;
+  z-index: 2;
+}
+
+.theme-slot-couture {
+  scroll-margin-top: 4.5rem;
+}
+
+/* Footer */
+.theme-footer-couture {
+  border-top: 1px solid var(--border);
+  padding: 3rem 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+.theme-footer-couture-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+.theme-footer-couture-logo {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--fg);
+  letter-spacing: 0.04em;
+}
+.theme-footer-couture-tagline {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.theme-footer-couture-copyright {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.75rem;
+}

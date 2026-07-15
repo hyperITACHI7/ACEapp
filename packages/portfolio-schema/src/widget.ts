@@ -1,7 +1,11 @@
 import { z } from "zod";
 
 // Every widget lives in one continuous 2-column grid running down the whole portfolio —
-// `x` picks the column, `y` the row, `w`/`h` how many columns/rows it spans (1 or 2 each).
+// `x` picks the column, `y` the row, `w` how many columns it spans (1 or 2), `h` how many rows.
+// `h` is an open integer (capped defensively at 12) because a widget's native footprint spans as
+// many rows as its reference design is tall — one row ≈ 330px of rendered desktop height — while
+// the renderer's `grid-auto-rows: auto` means rows always size to content, so a tall `h` is
+// organizational (sidebar proportions, row-sharing granularity), never a hard pixel height.
 // `.optional()` on the parent field (not `.default()`) is deliberate: "entirely absent" is the
 // meaningful backward-compatible value — every existing stored widget simply lacks this key and
 // falls back to a deterministic full-width default (see `resolveGridLayout` below) until the
@@ -10,7 +14,7 @@ export const GridPlacementSchema = z.object({
   x: z.union([z.literal(0), z.literal(1)]),
   y: z.number().int().min(0),
   w: z.union([z.literal(1), z.literal(2)]),
-  h: z.union([z.literal(1), z.literal(2)]),
+  h: z.number().int().min(1).max(12),
 });
 
 export const WidgetInstanceSchema = z.object({

@@ -1,0 +1,12 @@
+{
+  "key": "couture-editorial-awards",
+  "label": "Awards (Couture Editorial)",
+  "section": "awards",
+  "sizes": ["1x2", "1x1", "2x1"],
+  "bundledWith": "couture-editorial",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Recognition" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Awards &\nHonours" },
+    { "name": "intro", "label": "Intro paragraph", "type": "text", "default": "Recognition from the industry's most prestigious institutions." }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "key": "couture-editorial-mood-board",
+  "label": "Mood Board (Couture Editorial)",
+  "section": "mood-board",
+  "sizes": ["2x2", "2x1"],
+  "bundledWith": "couture-editorial",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Visual Research" },
+    { "name": "heading", "label": "Section heading", "type": "text", "default": "Mood\nBoard" }
+  ]
+}

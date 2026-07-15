@@ -33,6 +33,18 @@
 @import "../../../../packages/widgets/skills-marquee/skills-marquee.css";
 @import "../../../../packages/widgets/contact-animated/contact-animated.css";
 @import "../../../../packages/widgets/divider/divider.css";
+@import "../../../../packages/widgets/_shared/couture-editorial-family.css";
+@import "../../../../packages/widgets/couture-editorial-about/couture-editorial-about.css";
+@import "../../../../packages/widgets/couture-editorial-gallery/couture-editorial-gallery.css";
+@import "../../../../packages/widgets/couture-editorial-experience-timeline/couture-editorial-experience-timeline.css";
+@import "../../../../packages/widgets/couture-editorial-contact/couture-editorial-contact.css";
+@import "../../../../packages/widgets/couture-editorial-awards/couture-editorial-awards.css";
+@import "../../../../packages/widgets/couture-editorial-skills/couture-editorial-skills.css";
+@import "../../../../packages/widgets/couture-editorial-quote/couture-editorial-quote.css";
+@import "../../../../packages/widgets/couture-editorial-hero/couture-editorial-hero.css";
+@import "../../../../packages/widgets/couture-editorial-mood-board/couture-editorial-mood-board.css";
+@import "../../../../packages/widgets/couture-editorial-banner/couture-editorial-banner.css";
+@import "../../../../packages/themes/couture-editorial/couture-editorial.css";
 @import "./(app)/editor/outline-sidebar.css";
 
 /* NOTE: Tailwind v4's automatic content scanner only walks apps/web — it never sees class names

@@ -1,0 +1,114 @@
+.widget-couture-gallery-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.widget-couture-gallery-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.widget-couture-gallery-filter {
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+}
+.widget-couture-gallery-filter--active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.widget-couture-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+}
+
+.widget-couture-gallery-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.widget-couture-gallery-image-wrap {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.widget-couture-gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(10%);
+  transition: transform 0.5s ease;
+}
+.widget-couture-gallery-card:hover .widget-couture-gallery-image {
+  transform: scale(1.04);
+}
+.widget-couture-gallery-image--placeholder {
+  background: var(--card, #111009);
+  border: 1px solid var(--border);
+}
+
+.widget-couture-gallery-tag {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background: rgba(8, 8, 6, 0.75);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.6rem;
+}
+
+.widget-couture-gallery-title {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--fg);
+  margin: 0 0 0.35rem;
+}
+
+.widget-couture-gallery-meta {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0;
+}
+
+.widget-couture-gallery-add {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --strip (h=1 compact variant, set by the component's footprint lookup): smaller landscape
+ * cards in one dense row instead of tall 3:4 portraits. */
+.widget-couture-gallery--strip .widget-couture-gallery-grid {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1.25rem;
+}
+.widget-couture-gallery--strip .widget-couture-gallery-image-wrap {
+  aspect-ratio: 4 / 3;
+  margin-bottom: 0.6rem;
+}
+.widget-couture-gallery--strip .widget-couture-gallery-title {
+  font-size: 0.95rem;
+}
+.widget-couture-gallery--strip .widget-couture-gallery-add {
+  min-height: 120px;
+}

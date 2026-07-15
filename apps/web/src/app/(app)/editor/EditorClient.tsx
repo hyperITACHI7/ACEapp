@@ -104,7 +104,10 @@ export function EditorClient({ portfolioId, initialData, initialVersion, publish
   );
 
   return (
-    <div className="flex flex-col gap-4 max-w-[1800px] mx-auto">
+    // lg: the page is exactly viewport height (100vh minus MainBackground's p-6 = 3rem) so the
+    // preview frame's bottom edge sits at the screen's bottom edge; each column scrolls
+    // internally instead of the page. Below lg everything stacks and the page scrolls as before.
+    <div className="flex flex-col gap-4 max-w-[1800px] mx-auto lg:h-[calc(100vh-3rem)]">
       <TopBar
         portfolioId={portfolioId}
         draft={draft}
@@ -116,12 +119,12 @@ export function EditorClient({ portfolioId, initialData, initialVersion, publish
       />
 
       <div
-        className={`grid grid-cols-1 gap-6 items-start ${
+        className={`grid grid-cols-1 gap-6 items-start lg:items-stretch lg:flex-1 lg:min-h-0 ${
           outlineCollapsed ? "lg:grid-cols-[40px_1fr_320px]" : "lg:grid-cols-[260px_1fr_320px]"
         }`}
       >
         <div
-          className={`lg:sticky lg:top-6 max-h-[85vh] no-scrollbar ${outlineDragging ? "overflow-visible" : "overflow-y-auto"}`}
+          className={`max-h-[85vh] lg:max-h-none lg:min-h-0 no-scrollbar ${outlineDragging ? "overflow-visible" : "overflow-y-auto"}`}
         >
           <button
             type="button"
@@ -159,24 +162,24 @@ export function EditorClient({ portfolioId, initialData, initialVersion, publish
         </div>
 
         {/* Neutral frame only — the rendered portfolio has its own independent theme
-           palette and must not inherit this app's dark chrome. Always a fixed-ratio "device
-           screen" frame now (16:9 desktop / 9:16 mobile), driven by the explicit toggle in
-           TopBar rather than the outline sidebar's collapse state (which just frees horizontal
-           room, unrelated) — a real, fixed frame height is also what makes the editor-only
-           `cqh`-based header sizing below actually work (see globals.css). */}
+           palette and must not inherit this app's dark chrome. Desktop mode fills the page's
+           full remaining height (grid stretch — bottom edge at the screen edge, width and
+           therefore widget scale unchanged); mobile mode stays a fixed-ratio 9:16 phone frame.
+           Both give the frame a real, definite CSS height, which is what makes the editor-only
+           `cqh`-based sizing work (see .portfolio-canvas in globals.css). */}
         <EditorModeContext.Provider value={editorMode}>
           <div
-            className={`rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden max-h-[85vh] overflow-y-auto no-scrollbar ${
+            className={`rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden max-h-[85vh] lg:max-h-none overflow-y-auto no-scrollbar ${
               editingBreakpoint === "mobile"
-                ? "lg:w-full lg:mx-auto lg:max-w-[420px] lg:aspect-[9/16]"
-                : "lg:aspect-video"
+                ? "lg:w-full lg:mx-auto lg:max-w-[420px] lg:aspect-[9/16] lg:self-start lg:max-h-full"
+                : "lg:min-h-0"
             }`}
           >
             <EditorCanvas data={draft} />
           </div>
         </EditorModeContext.Provider>
 
-        <div className="lg:sticky lg:top-6 max-h-[85vh] overflow-y-auto no-scrollbar">
+        <div className="max-h-[85vh] lg:max-h-none lg:min-h-0 overflow-y-auto no-scrollbar">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3 px-1">
             Widget Drawer
           </h3>

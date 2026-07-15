@@ -1,0 +1,76 @@
+.widget-couture-banner {
+  position: relative;
+  /* cqw, never cqh (falls back to viewport units on the public page); no negative-margin
+   * full-bleed hacks (they bleed into adjacent grid rows — the grid has no padding to offset). */
+  min-height: clamp(16rem, 26cqw, 26rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-size: cover;
+  background-position: center;
+  background-color: #0a0a08;
+  padding: 4rem 1.5rem;
+}
+
+.widget-couture-banner-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(8, 8, 6, 0.85) 0%, rgba(8, 8, 6, 0.55) 100%);
+}
+
+.widget-couture-banner-bg-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 3;
+  bottom: auto;
+}
+
+.widget-couture-banner-content {
+  position: relative;
+  z-index: 2;
+  max-width: 40rem;
+}
+
+.widget-couture-banner-eyebrow {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-2, var(--accent));
+  margin-bottom: 1.25rem;
+}
+
+.widget-couture-banner-heading {
+  font-family: var(--font-heading, inherit);
+  font-size: clamp(1.75rem, 5cqw, 3rem);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--fg);
+  margin: 0 0 1.25rem;
+}
+
+.widget-couture-banner-copy {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0 0 2rem;
+}
+
+.widget-couture-banner-cta {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 0.9rem 1.75rem;
+  text-decoration: none;
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+.widget-couture-banner-cta:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

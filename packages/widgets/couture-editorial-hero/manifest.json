@@ -1,0 +1,14 @@
+{
+  "key": "couture-editorial-hero",
+  "label": "Hero (Couture Editorial)",
+  "section": "hero",
+  "lockedWidth": true,
+  "sizes": ["2x2"],
+  "bundledWith": "couture-editorial",
+  "configSchema": [
+    { "name": "eyebrow", "label": "Eyebrow label", "type": "text", "default": "Portfolio — Lifetime Digital Archive" },
+    { "name": "primaryCtaLabel", "label": "Primary button label", "type": "text", "default": "View Collections" },
+    { "name": "secondaryCtaLabel", "label": "Secondary button label", "type": "text", "default": "My Journey" },
+    { "name": "backgroundImage", "label": "Background image URL", "type": "text", "default": "/templates/couture-editorial/hero-bg.jpg" }
+  ]
+}
