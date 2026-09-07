@@ -8,6 +8,7 @@
     "services/*"
   ],
   "scripts": {
+    "postinstall": "npm run db:generate",
     "dev": "npm run dev -w @portfolio/web",
     "build": "npm run validate:registries && npm run build -w @portfolio/web",
     "start": "npm run start -w @portfolio/web",
